@@ -1,0 +1,621 @@
+/* ==========================================================================
+   components.css — UI component styles
+   StudyLens AI
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Buttons
+   -------------------------------------------------------------------------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--touch-target);
+  padding: var(--space-2) var(--space-5);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  line-height: 1.4;
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color var(--transition-fast),
+              border-color var(--transition-fast),
+              color var(--transition-fast),
+              box-shadow var(--transition-fast);
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+}
+
+.btn-secondary {
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--color-surface-alt);
+  border-color: var(--color-primary);
+}
+
+.btn-ghost {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--color-text);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background-color: var(--color-surface-alt);
+}
+
+.btn-full {
+  width: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   2. Form inputs and labels
+   -------------------------------------------------------------------------- */
+
+label {
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="file"] {
+  width: 100%;
+  min-height: var(--touch-target);
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  appearance: none;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="file"]:focus {
+  outline: none;
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+input[type="file"] {
+  cursor: pointer;
+  padding: var(--space-2);
+}
+
+.field-hint {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.field-required {
+  color: var(--color-danger-text);
+  margin-left: 2px;
+}
+
+.field-optional {
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+/* --------------------------------------------------------------------------
+   3. Alerts and inline errors
+   -------------------------------------------------------------------------- */
+
+.alert {
+  display: block;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1.5px solid;
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+}
+
+.alert-error,
+.field-error {
+  color: var(--color-danger-text);
+  background-color: var(--color-danger-bg);
+  border-color: var(--color-danger-border);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+}
+
+.alert-danger {
+  color: var(--color-danger-text);
+  background-color: var(--color-danger-bg);
+  border-color: var(--color-danger-border);
+  font-weight: 600;
+}
+
+.alert-caution {
+  color: var(--color-caution-text);
+  background-color: var(--color-caution-bg);
+  border-color: var(--color-caution-border);
+}
+
+.alert-success {
+  color: var(--color-success-text);
+  background-color: var(--color-success-bg);
+  border-color: var(--color-success-border);
+}
+
+/* --------------------------------------------------------------------------
+   4. Auth tabs
+   -------------------------------------------------------------------------- */
+
+.auth-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--color-border);
+  margin-bottom: var(--space-5);
+}
+
+.auth-tab {
+  flex: 1;
+  min-height: var(--touch-target);
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background-color: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.auth-tab:hover:not(.auth-tab--active) {
+  color: var(--color-text);
+  background-color: var(--color-surface-alt);
+}
+
+.auth-tab--active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+/* --------------------------------------------------------------------------
+   5. Readiness score card
+   -------------------------------------------------------------------------- */
+
+.score-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 4px solid var(--color-primary);
+  margin: 0 auto var(--space-6);
+  background-color: var(--color-primary-light);
+}
+
+.score-value {
+  font-size: var(--font-size-3xl);
+  font-weight: 800;
+  color: var(--color-primary-dark);
+  line-height: 1;
+}
+
+.score-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  font-weight: 600;
+  text-align: center;
+}
+
+/* --------------------------------------------------------------------------
+   6. Coverage summary counts
+   -------------------------------------------------------------------------- */
+
+.coverage-count {
+  font-size: var(--font-size-2xl);
+  font-weight: 800;
+  color: var(--color-text);
+  line-height: 1;
+}
+
+.coverage-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   7. Badges
+   -------------------------------------------------------------------------- */
+
+.badge {
+  display: inline-block;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+/* Coverage status badges */
+.badge-covered {
+  background-color: var(--color-covered-bg);
+  color: var(--color-covered-text);
+}
+
+.badge-partial {
+  background-color: var(--color-partial-bg);
+  color: var(--color-partial-text);
+}
+
+.badge-missing {
+  background-color: var(--color-missing-bg);
+  color: var(--color-missing-text);
+}
+
+/* Importance badges */
+.badge-importance-high {
+  background-color: var(--color-importance-high-bg);
+  color: var(--color-importance-high-text);
+}
+
+.badge-importance-medium {
+  background-color: var(--color-importance-med-bg);
+  color: var(--color-importance-med-text);
+}
+
+.badge-importance-low {
+  background-color: var(--color-importance-low-bg);
+  color: var(--color-importance-low-text);
+}
+
+/* Score badges used by history.js */
+.score-badge {
+  display: inline-block;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.score-badge--good {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
+.score-badge--caution {
+  background-color: var(--color-caution-bg);
+  color: var(--color-caution-text);
+}
+
+.score-badge--danger {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger-text);
+}
+
+/* --------------------------------------------------------------------------
+   8. Data table (topic coverage)
+   -------------------------------------------------------------------------- */
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.data-table th {
+  background-color: var(--color-surface-alt);
+  color: var(--color-text-muted);
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  border-bottom: 2px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: top;
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+.data-table tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table tr:hover td {
+  background-color: var(--color-surface-alt);
+}
+
+/* --------------------------------------------------------------------------
+   9. Warnings list
+   -------------------------------------------------------------------------- */
+
+.warnings-list {
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-caution-bg);
+  border: 1.5px solid var(--color-caution-border);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-5);
+}
+
+.warnings-items {
+  margin: 0;
+  padding-left: var(--space-5);
+}
+
+.warnings-items li {
+  color: var(--color-caution-text);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--space-1);
+}
+
+.warnings-items li:last-child {
+  margin-bottom: 0;
+}
+
+/* --------------------------------------------------------------------------
+   10. Knowledge gap cards
+   -------------------------------------------------------------------------- */
+
+.gap-item {
+  background-color: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  box-shadow: 0 1px 3px var(--color-shadow);
+}
+
+.gap-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.gap-title {
+  font-weight: 700;
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  flex: 1;
+  min-width: 0;
+}
+
+.gap-explanation {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   11. Revision plan tasks
+   -------------------------------------------------------------------------- */
+
+.revision-total {
+  font-weight: 700;
+  font-size: var(--font-size-base);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-4);
+}
+
+.revision-task {
+  background-color: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  box-shadow: 0 1px 3px var(--color-shadow);
+  list-style: none;
+}
+
+.revision-task--maintenance {
+  border-color: var(--color-success-border);
+  background-color: var(--color-success-bg);
+}
+
+.revision-task-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.revision-task-title {
+  font-weight: 700;
+  color: var(--color-text);
+  flex: 1;
+}
+
+.revision-task-duration {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-text-muted);
+  background-color: var(--color-surface-alt);
+  padding: 2px var(--space-3);
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+.revision-task-description {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   12. Progress panel / spinner
+   -------------------------------------------------------------------------- */
+
+.progress-status {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  margin-top: var(--space-3);
+  min-height: var(--font-size-base);
+}
+
+.spinner {
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto var(--space-4);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* --------------------------------------------------------------------------
+   13. Session history cards
+   -------------------------------------------------------------------------- */
+
+.session-card {
+  background-color: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  cursor: pointer;
+  transition: border-color var(--transition-fast),
+              box-shadow var(--transition-fast),
+              transform var(--transition-fast);
+  box-shadow: 0 1px 3px var(--color-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.session-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 12px var(--color-shadow);
+  transform: translateY(-1px);
+}
+
+.session-card:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.session-card-title {
+  font-weight: 700;
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.session-card-date {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.session-card-score {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.session-card-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.session-summary-item {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  background-color: var(--color-surface-alt);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+}
+
+.session-card-status {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.session-status--pending  { color: var(--color-text-muted); }
+.session-status--failed   { color: var(--color-danger-text); }
+
+/* --------------------------------------------------------------------------
+   14. Empty state
+   -------------------------------------------------------------------------- */
+
+.empty-state {
+  text-align: center;
+  color: var(--color-text-muted);
+  padding: var(--space-8) var(--space-4);
+  font-style: italic;
+}
+
+/* --------------------------------------------------------------------------
+   15. Navigation brand title — hide on very narrow viewports
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 375px) {
+  .nav-title {
+    display: none;
+  }
+
+  .panel {
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+  }
+
+  .score-card {
+    width: 110px;
+    height: 110px;
+  }
+
+  .score-value {
+    font-size: var(--font-size-2xl);
+  }
+}

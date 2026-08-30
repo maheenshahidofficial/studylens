@@ -1,0 +1,165 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Create the top-level directory structure and all placeholder module files": [
+      {
+        "executionId": "90870c21-3940-463c-bf8f-6475e170e0bb",
+        "chatSessionId": "sess_4b18c8c9-90d8-47c3-a0b8-d2d94a3cd102",
+        "timestamp": 1788019229917
+      },
+      {
+        "executionId": "90870c21-3940-463c-bf8f-6475e170e0bb",
+        "chatSessionId": "sess_4b18c8c9-90d8-47c3-a0b8-d2d94a3cd102",
+        "timestamp": 1788019338290
+      }
+    ],
+    "1.2 Create `requirements.txt` with pinned dependencies": [
+      {
+        "executionId": "90870c21-3940-463c-bf8f-6475e170e0bb",
+        "chatSessionId": "sess_4b18c8c9-90d8-47c3-a0b8-d2d94a3cd102",
+        "timestamp": 1788019232143
+      },
+      {
+        "executionId": "90870c21-3940-463c-bf8f-6475e170e0bb",
+        "chatSessionId": "sess_4b18c8c9-90d8-47c3-a0b8-d2d94a3cd102",
+        "timestamp": 1788019338974
+      }
+    ],
+    "1.3 Create `.env.example` and `.gitignore`": [
+      {
+        "executionId": "90870c21-3940-463c-bf8f-6475e170e0bb",
+        "chatSessionId": "sess_4b18c8c9-90d8-47c3-a0b8-d2d94a3cd102",
+        "timestamp": 1788019232620
+      },
+      {
+        "executionId": "90870c21-3940-463c-bf8f-6475e170e0bb",
+        "chatSessionId": "sess_4b18c8c9-90d8-47c3-a0b8-d2d94a3cd102",
+        "timestamp": 1788019339660
+      }
+    ],
+    "1. Project scaffolding and environment setup": [
+      {
+        "executionId": "90870c21-3940-463c-bf8f-6475e170e0bb",
+        "chatSessionId": "sess_4b18c8c9-90d8-47c3-a0b8-d2d94a3cd102",
+        "timestamp": 1788019339912
+      }
+    ],
+    "2.1 Implement `db.py` with connection management and schema initialisation": [
+      {
+        "executionId": "ba2cea21-cc0a-473a-b514-bfea1abb34ba",
+        "chatSessionId": "sess_4b18c8c9-90d8-47c3-a0b8-d2d94a3cd102",
+        "timestamp": 1788019670346
+      },
+      {
+        "executionId": "ba2cea21-cc0a-473a-b514-bfea1abb34ba",
+        "chatSessionId": "sess_4b18c8c9-90d8-47c3-a0b8-d2d94a3cd102",
+        "timestamp": 1788019726939
+      }
+    ],
+    "2.2 Wire `db.py` into `app.py` Flask application factory": [
+      {
+        "executionId": "152e8837-c4fd-447b-b6c4-f3434523771a",
+        "chatSessionId": "sess_4b18c8c9-90d8-47c3-a0b8-d2d94a3cd102",
+        "timestamp": 1788019890113
+      },
+      {
+        "executionId": "152e8837-c4fd-447b-b6c4-f3434523771a",
+        "chatSessionId": "sess_4b18c8c9-90d8-47c3-a0b8-d2d94a3cd102",
+        "timestamp": 1788020067363
+      }
+    ],
+    "2. Database schema and helpers (`db.py`)": [
+      {
+        "executionId": "152e8837-c4fd-447b-b6c4-f3434523771a",
+        "chatSessionId": "sess_4b18c8c9-90d8-47c3-a0b8-d2d94a3cd102",
+        "timestamp": 1788020067481
+      }
+    ],
+    "3.1 Implement `register(email, password) -> None`": [
+      {
+        "executionId": "e7fa4720-b3da-4b3d-888c-fe35f662bb6d",
+        "chatSessionId": "sess_4b18c8c9-90d8-47c3-a0b8-d2d94a3cd102",
+        "timestamp": 1788020396799
+      },
+      {
+        "executionId": "e7fa4720-b3da-4b3d-888c-fe35f662bb6d",
+        "chatSessionId": "sess_4b18c8c9-90d8-47c3-a0b8-d2d94a3cd102",
+        "timestamp": 1788020461573
+      }
+    ],
+    "3.2 Implement `login(email, password) -> str`": [
+      {
+        "executionId": "e7fa4720-b3da-4b3d-888c-fe35f662bb6d",
+        "chatSessionId": "sess_4b18c8c9-90d8-47c3-a0b8-d2d94a3cd102",
+        "timestamp": 1788020397448
+      },
+      {
+        "executionId": "e7fa4720-b3da-4b3d-888c-fe35f662bb6d",
+        "chatSessionId": "sess_4b18c8c9-90d8-47c3-a0b8-d2d94a3cd102",
+        "timestamp": 1788020462165
+      }
+    ],
+    "3.3 Implement `@require_auth` decorator": [
+      {
+        "executionId": "e7fa4720-b3da-4b3d-888c-fe35f662bb6d",
+        "chatSessionId": "sess_4b18c8c9-90d8-47c3-a0b8-d2d94a3cd102",
+        "timestamp": 1788020398187
+      },
+      {
+        "executionId": "e7fa4720-b3da-4b3d-888c-fe35f662bb6d",
+        "chatSessionId": "sess_4b18c8c9-90d8-47c3-a0b8-d2d94a3cd102",
+        "timestamp": 1788020462814
+      }
+    ],
+    "3. Auth module — core logic (`auth.py`)": [
+      {
+        "executionId": "e7fa4720-b3da-4b3d-888c-fe35f662bb6d",
+        "chatSessionId": "sess_4b18c8c9-90d8-47c3-a0b8-d2d94a3cd102",
+        "timestamp": 1788020462932
+      }
+    ],
+    "4.1 Implement `POST /auth/register` route": [
+      {
+        "executionId": "b1caa992-8517-44b3-9dbd-0cfbac53af3e",
+        "chatSessionId": "sess_4b18c8c9-90d8-47c3-a0b8-d2d94a3cd102",
+        "timestamp": 1788020645346
+      },
+      {
+        "executionId": "b1caa992-8517-44b3-9dbd-0cfbac53af3e",
+        "chatSessionId": "sess_4b18c8c9-90d8-47c3-a0b8-d2d94a3cd102",
+        "timestamp": 1788020801255
+      }
+    ],
+    "4.2 Implement `POST /auth/login` route": [
+      {
+        "executionId": "b1caa992-8517-44b3-9dbd-0cfbac53af3e",
+        "chatSessionId": "sess_4b18c8c9-90d8-47c3-a0b8-d2d94a3cd102",
+        "timestamp": 1788020645947
+      },
+      {
+        "executionId": "b1caa992-8517-44b3-9dbd-0cfbac53af3e",
+        "chatSessionId": "sess_4b18c8c9-90d8-47c3-a0b8-d2d94a3cd102",
+        "timestamp": 1788020803281
+      }
+    ],
+    "4.3 Add global error handlers for 400, 401, 403, 404, 409, 413, 415, 429, 500": [
+      {
+        "executionId": "b1caa992-8517-44b3-9dbd-0cfbac53af3e",
+        "chatSessionId": "sess_4b18c8c9-90d8-47c3-a0b8-d2d94a3cd102",
+        "timestamp": 1788020647264
+      },
+      {
+        "executionId": "b1caa992-8517-44b3-9dbd-0cfbac53af3e",
+        "chatSessionId": "sess_4b18c8c9-90d8-47c3-a0b8-d2d94a3cd102",
+        "timestamp": 1788020803597
+      }
+    ],
+    "4. Auth API endpoints (`app.py`)": [
+      {
+        "executionId": "b1caa992-8517-44b3-9dbd-0cfbac53af3e",
+        "chatSessionId": "sess_4b18c8c9-90d8-47c3-a0b8-d2d94a3cd102",
+        "timestamp": 1788020803708
+      }
+    ]
+  }
+}

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyLens AI — Exam Readiness Auditor</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/static/css/base.css" />
+  <link rel="stylesheet" href="/static/css/layout.css" />
+  <link rel="stylesheet" href="/static/css/components.css" />
+</head>
+<body>
+
+  <!-- =====================================================================
+       Navigation
+       ===================================================================== -->
+  <header id="nav" role="banner">
+    <div class="nav-inner">
+      <a href="/" class="nav-brand" aria-label="StudyLens AI home">
+        <span class="nav-logo" aria-hidden="true">🔍</span>
+        <span class="nav-title">StudyLens AI</span>
+      </a>
+
+      <nav class="nav-actions" aria-label="Site navigation">
+        <!-- Shown when NOT authenticated -->
+        <div id="nav-auth-links" class="nav-group">
+          <button id="nav-show-login" type="button" class="btn btn-ghost">
+            Log in
+          </button>
+          <button id="nav-show-register" type="button" class="btn btn-primary">
+            Register
+          </button>
+        </div>
+
+        <!-- Shown when authenticated -->
+        <div id="nav-user-links" class="nav-group" hidden>
+          <button id="nav-show-history" type="button" class="btn btn-ghost">
+            My Sessions
+          </button>
+          <button id="nav-logout" type="button" class="btn btn-ghost">
+            Log out
+          </button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Global live-region for status/error announcements -->
+  <div id="global-status" role="status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <main id="main-content">
+
+    <!-- ==================================================================
+         Auth panel — register and login forms
+         Visible when the user is NOT authenticated.
+         ================================================================== -->
+    <section id="auth-panel" class="panel" aria-labelledby="auth-heading">
+      <h1 id="auth-heading" class="panel-title">Welcome to StudyLens AI</h1>
+      <p class="panel-subtitle">
+        Audit your study material against your course syllabus and get a
+        personalised exam-readiness report.
+      </p>
+
+      <!-- Auth error live region -->
+      <div id="auth-error" role="status" aria-live="assertive" class="alert alert-error" hidden></div>
+
+      <!-- Tab controls -->
+      <div class="auth-tabs" role="tablist" aria-label="Authentication options">
+        <button
+          id="tab-login"
+          role="tab"
+          aria-selected="true"
+          aria-controls="form-login"
+          type="button"
+          class="auth-tab auth-tab--active"
+        >
+          Log in
+        </button>
+        <button
+          id="tab-register"
+          role="tab"
+          aria-selected="false"
+          aria-controls="form-register"
+          type="button"
+          class="auth-tab"
+        >
+          Register
+        </button>
+      </div>
+
+      <!-- Login form -->
+      <form
+        id="form-login"
+        role="tabpanel"
+        aria-labelledby="tab-login"
+        class="auth-form"
+        novalidate
+      >
+        <div class="field">
+          <label for="login-email">Email address</label>
+          <input
+            id="login-email"
+            name="email"
+            type="email"
+            autocomplete="email"
+            required
+            placeholder="you@university.edu"
+          />
+        </div>
+
+        <div class="field">
+          <label for="login-password">Password</label>
+          <input
+            id="login-password"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            required
+          />
+        </div>
+
+        <div id="login-error" role="status" aria-live="assertive" class="field-error" hidden></div>
+
+        <button id="btn-login" type="submit" class="btn btn-primary btn-full">
+          Log in
+        </button>
+      </form>
+
+      <!-- Register form -->
+      <form
+        id="form-register"
+        role="tabpanel"
+        aria-labelledby="tab-register"
+        class="auth-form"
+        hidden
+        novalidate
+      >
+        <div class="field">
+          <label for="register-email">Email address</label>
+          <input
+            id="register-email"
+            name="email"
+            type="email"
+            autocomplete="email"
+            required
+            placeholder="you@university.edu"
+          />
+        </div>
+
+        <div class="field">
+          <label for="register-password">Password</label>
+          <input
+            id="register-password"
+            name="password"
+            type="password"
+            autocomplete="new-password"
+            required
+            aria-describedby="register-password-hint"
+          />
+          <span id="register-password-hint" class="field-hint">
+            8–128 characters
+          </span>
+        </div>
+
+        <div id="register-error" role="status" aria-live="assertive" class="field-error" hidden></div>
+
+        <button id="btn-register" type="submit" class="btn btn-primary btn-full">
+          Create account
+        </button>
+      </form>
+    </section>
+
+    <!-- ==================================================================
+         Upload panel — PDF upload form
+         Visible when the user IS authenticated.
+         ================================================================== -->
+    <section id="upload-panel" class="panel" aria-labelledby="upload-heading" hidden>
+      <h1 id="upload-heading" class="panel-title">Analyse Your Study Material</h1>
+      <p class="panel-subtitle">
+        Upload your course syllabus and lecture notes to receive an
+        exam-readiness report.
+      </p>
+
+      <form id="form-upload" class="upload-form" novalidate enctype="multipart/form-data">
+
+        <div class="field">
+          <label for="input-study-material">
+            Study material
+            <span class="field-required" aria-hidden="true">*</span>
+          </label>
+          <input
+            id="input-study-material"
+            name="study_material"
+            type="file"
+            accept=".pdf,application/pdf"
+            required
+            aria-describedby="study-material-hint study-material-error"
+          />
+          <span id="study-material-hint" class="field-hint">PDF only, max 20 MB</span>
+          <span id="study-material-error" role="status" aria-live="assertive" class="field-error" hidden></span>
+        </div>
+
+        <div class="field">
+          <label for="input-syllabus">
+            Course syllabus
+            <span class="field-required" aria-hidden="true">*</span>
+          </label>
+          <input
+            id="input-syllabus"
+            name="syllabus"
+            type="file"
+            accept=".pdf,application/pdf"
+            required
+            aria-describedby="syllabus-hint syllabus-error"
+          />
+          <span id="syllabus-hint" class="field-hint">PDF only, max 20 MB</span>
+          <span id="syllabus-error" role="status" aria-live="assertive" class="field-error" hidden></span>
+        </div>
+
+        <div class="field">
+          <label for="input-course-name">Course name <span class="field-optional">(optional)</span></label>
+          <input
+            id="input-course-name"
+            name="course_name"
+            type="text"
+            autocomplete="off"
+            placeholder="e.g. Introduction to Machine Learning"
+          />
+        </div>
+
+        <div id="upload-error" role="status" aria-live="assertive" class="alert alert-error" hidden></div>
+
+        <button id="btn-analyze" type="submit" class="btn btn-primary btn-full" disabled>
+          Analyse my study material
+        </button>
+      </form>
+    </section>
+
+    <!-- ==================================================================
+         Progress panel — shown while analysis is running
+         ================================================================== -->
+    <section id="progress-panel" class="panel panel-centered" aria-labelledby="progress-heading" hidden>
+      <div class="spinner" aria-hidden="true"></div>
+      <h2 id="progress-heading" class="panel-title">Analysing your documents…</h2>
+      <p class="panel-subtitle">
+        This may take up to 60 seconds. Please don't close this page.
+      </p>
+      <div id="progress-status" role="status" aria-live="polite" class="progress-status"></div>
+    </section>
+
+    <!-- ==================================================================
+         Report panel — displays readiness report and revision plan
+         Initially hidden; shown after a successful analysis.
+         ================================================================== -->
+    <section id="report-panel" class="panel" aria-labelledby="report-heading" hidden>
+      <div class="report-header">
+        <h1 id="report-heading" class="panel-title">Your Exam Readiness Report</h1>
+        <button id="btn-new-analysis" type="button" class="btn btn-secondary">
+          New analysis
+        </button>
+      </div>
+
+      <!-- Readiness score -->
+      <div id="readiness-score-container" class="score-card" aria-label="Readiness score">
+        <div id="readiness-score" class="score-value" aria-live="polite">—</div>
+        <div class="score-label">Readiness Score</div>
+      </div>
+
+      <!-- Score alert banners (hidden until rendered by report.js) -->
+      <div id="score-alert-danger" role="alert" class="alert alert-danger" hidden>
+        Your score is below 50%. Review missing and partially covered topics
+        before your exam.
+      </div>
+      <div id="score-alert-caution" role="alert" class="alert alert-caution" hidden>
+        Your preparation is partial. Review the partially covered topics below.
+      </div>
+
+      <!-- Coverage summary -->
+      <div id="coverage-summary" class="coverage-summary" aria-label="Coverage summary">
+        <div class="coverage-item">
+          <span id="count-covered" class="coverage-count">—</span>
+          <span class="coverage-label">Covered</span>
+        </div>
+        <div class="coverage-item">
+          <span id="count-partial" class="coverage-count">—</span>
+          <span class="coverage-label">Partial</span>
+        </div>
+        <div class="coverage-item">
+          <span id="count-missing" class="coverage-count">—</span>
+          <span class="coverage-label">Missing</span>
+        </div>
+      </div>
+
+      <!-- Warnings from extraction / pipeline -->
+      <div id="report-warnings" role="status" aria-live="polite" class="warnings-list" hidden></div>
+
+      <!-- Per-topic coverage table -->
+      <section aria-labelledby="topics-heading">
+        <h2 id="topics-heading">Topic Coverage</h2>
+        <div class="table-wrapper" role="region" aria-label="Topic coverage table" tabindex="0">
+          <table id="topics-table" class="data-table">
+            <thead>
+              <tr>
+                <th scope="col">Topic</th>
+                <th scope="col">Importance</th>
+                <th scope="col">Status</th>
+                <th scope="col">Reasoning</th>
+              </tr>
+            </thead>
+            <tbody id="topics-tbody">
+              <!-- Rows injected by report.js -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Knowledge gaps -->
+      <section aria-labelledby="gaps-heading">
+        <h2 id="gaps-heading">Knowledge Gaps</h2>
+        <div id="gaps-list" class="gaps-list" role="list">
+          <!-- Items injected by report.js -->
+          <p id="gaps-empty" class="empty-state" hidden>
+            No knowledge gaps detected — your study material covers the full syllabus.
+          </p>
+        </div>
+      </section>
+
+      <!-- Revision plan (rendered by revisionPlan.js) -->
+      <section aria-labelledby="revision-heading">
+        <h2 id="revision-heading">Revision Plan</h2>
+        <div id="revision-plan-container">
+          <div id="revision-total-time" class="revision-total" aria-live="polite"></div>
+          <ol id="revision-tasks-list" class="revision-tasks" aria-label="Revision tasks">
+            <!-- Tasks injected by revisionPlan.js -->
+          </ol>
+        </div>
+      </section>
+    </section>
+
+    <!-- ==================================================================
+         History panel — past analysis sessions
+         ================================================================== -->
+    <section id="history-panel" class="panel" aria-labelledby="history-heading" hidden>
+      <div class="history-header">
+        <h1 id="history-heading" class="panel-title">My Analysis Sessions</h1>
+        <button id="btn-new-from-history" type="button" class="btn btn-primary">
+          New analysis
+        </button>
+      </div>
+
+      <div id="history-error" role="status" aria-live="assertive" class="alert alert-error" hidden></div>
+
+      <div id="history-list" class="session-list" role="list">
+        <!-- Session cards injected by history.js -->
+      </div>
+
+      <p id="history-empty" class="empty-state" hidden>
+        You haven't run any analyses yet. Upload your study material to get started.
+      </p>
+    </section>
+
+  </main>
+
+  <footer class="site-footer" role="contentinfo">
+    <p>StudyLens AI &copy; <span id="footer-year"></span></p>
+  </footer>
+
+  <!-- =====================================================================
+       JavaScript modules (loaded after DOM; no defer needed for type=module)
+       ===================================================================== -->
+  <script type="module" src="/static/js/api.js"></script>
+  <script type="module" src="/static/js/auth.js"></script>
+  <script type="module" src="/static/js/upload.js"></script>
+  <script type="module" src="/static/js/report.js"></script>
+  <script type="module" src="/static/js/revisionPlan.js"></script>
+  <script type="module" src="/static/js/history.js"></script>
+
+  <!-- Inline: set footer year without a module dependency -->
+  <script>
+    document.getElementById('footer-year').textContent = new Date().getFullYear();
+  </script>
+
+</body>
+</html>

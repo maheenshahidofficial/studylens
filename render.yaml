@@ -1,0 +1,36 @@
+# render.yaml — Render free-tier deployment configuration for StudyLens AI
+# https://render.com/docs/infrastructure-as-code
+
+services:
+  - type: web
+    name: studylens-ai
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+
+    # Environment variables.
+    # Secrets are synced from Render's Secret Store — never hard-coded here.
+    envVars:
+      - key: JWT_SECRET
+        sync: false        # Set this as a secret in the Render dashboard
+
+      - key: GROQ_API_KEY
+        sync: false        # Set this as a secret in the Render dashboard
+
+      - key: GROQ_MODEL
+        value: openai/gpt-oss-120b
+
+      - key: UPLOAD_ROOT
+        value: /data/uploads
+
+      - key: DATABASE_URL
+        value: /data/studylens.db
+
+      - key: FLASK_ENV
+        value: production
+
+    # Persistent disk — stores uploaded PDFs and the SQLite database.
+    # Mounted at /data so UPLOAD_ROOT and DATABASE_URL paths work correctly.
+    disk:
+      name: studylens-data
+      mountPath: /data
+      sizeGB: 1

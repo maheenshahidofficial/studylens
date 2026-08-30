@@ -1,0 +1,321 @@
+/* ==========================================================================
+   layout.css — Responsive page structure
+   Breakpoints:  ≤375px  |  ≥768px  |  ≥1280px
+   StudyLens AI
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Page chrome
+   -------------------------------------------------------------------------- */
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* --------------------------------------------------------------------------
+   2. Navigation
+   -------------------------------------------------------------------------- */
+
+#nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: 0 1px 3px var(--color-shadow);
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+  height: 56px;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: var(--font-size-lg);
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+.nav-logo {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+}
+
+.nav-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+/* --------------------------------------------------------------------------
+   3. Main content area
+   -------------------------------------------------------------------------- */
+
+#main-content {
+  flex: 1;
+  width: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4);
+}
+
+/* --------------------------------------------------------------------------
+   4. Panel base — all section panels
+   -------------------------------------------------------------------------- */
+
+.panel {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  margin-bottom: var(--space-6);
+  box-shadow: 0 1px 4px var(--color-shadow);
+}
+
+.panel-centered {
+  text-align: center;
+}
+
+.panel-title {
+  font-size: var(--font-size-2xl);
+  margin-bottom: var(--space-2);
+}
+
+.panel-subtitle {
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-6);
+}
+
+/* --------------------------------------------------------------------------
+   5. Auth panel layout
+   -------------------------------------------------------------------------- */
+
+#auth-panel {
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* --------------------------------------------------------------------------
+   6. Upload panel layout
+   -------------------------------------------------------------------------- */
+
+.upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: 600px;
+}
+
+/* --------------------------------------------------------------------------
+   7. Form fields
+   -------------------------------------------------------------------------- */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+/* --------------------------------------------------------------------------
+   8. Report panel layout
+   -------------------------------------------------------------------------- */
+
+.report-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+/* Score + summary row */
+.coverage-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.coverage-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 80px;
+}
+
+/* --------------------------------------------------------------------------
+   9. Table wrapper — makes tables scroll horizontally on small screens
+      without overflowing the page
+   -------------------------------------------------------------------------- */
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-6);
+}
+
+/* Prevent the page from growing wider than viewport */
+.table-wrapper::-webkit-scrollbar {
+  height: 6px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+}
+
+/* --------------------------------------------------------------------------
+   10. Gaps list
+   -------------------------------------------------------------------------- */
+
+.gaps-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+/* --------------------------------------------------------------------------
+   11. Revision plan
+   -------------------------------------------------------------------------- */
+
+.revision-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding-left: var(--space-6);
+  margin-bottom: var(--space-4);
+}
+
+/* --------------------------------------------------------------------------
+   12. History panel layout
+   -------------------------------------------------------------------------- */
+
+.session-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+/* --------------------------------------------------------------------------
+   13. Footer
+   -------------------------------------------------------------------------- */
+
+.site-footer {
+  background-color: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  padding: var(--space-4);
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* --------------------------------------------------------------------------
+   14. Breakpoint: ≥768px — two-column layouts
+   -------------------------------------------------------------------------- */
+
+@media (min-width: 768px) {
+  .nav-inner {
+    padding: 0 var(--space-6);
+  }
+
+  #main-content {
+    padding: var(--space-8) var(--space-6);
+  }
+
+  /* Upload form: wider on tablet */
+  .upload-form {
+    max-width: 720px;
+  }
+
+  /* Session history: 2-column grid */
+  .session-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+  }
+
+  /* Coverage summary: spread out */
+  .coverage-summary {
+    gap: var(--space-8);
+  }
+
+  /* Report header: stay on one row */
+  .report-header {
+    flex-wrap: nowrap;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   15. Breakpoint: ≥1280px — three-column layouts
+   -------------------------------------------------------------------------- */
+
+@media (min-width: 1280px) {
+  #main-content {
+    padding: var(--space-10) var(--space-8);
+  }
+
+  /* Session history: 3-column grid on large screens */
+  .session-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* Wider upload form */
+  .upload-form {
+    max-width: 820px;
+  }
+
+  /* Report panel: allow wider content */
+  .panel {
+    padding: var(--space-8);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   16. Overflow guard — ensure nothing causes horizontal scroll
+   -------------------------------------------------------------------------- */
+
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
