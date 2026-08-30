@@ -1,5 +1,36 @@
+# Environment files — never commit secrets
 .env
-*.db
-uploads/
+.env.*
+!.env.example
+
+# Python virtual environments
+venv/
+.venv/
+env/
+
+# Python cache
 __pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Database file
+*.db
+
+# Uploaded user files
+uploads/
+
+# Pytest cache
 .pytest_cache/
+
+# Kiro IDE local files (optional — remove if you want to commit specs)
+# .kiro/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.log
