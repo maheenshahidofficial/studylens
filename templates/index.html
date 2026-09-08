@@ -35,8 +35,11 @@
 
         <!-- Shown when authenticated -->
         <div id="nav-user-links" class="nav-group" hidden>
+          <button id="nav-show-dashboard" type="button" class="btn btn-ghost">
+            Dashboard
+          </button>
           <button id="nav-show-history" type="button" class="btn btn-ghost">
-            My Sessions
+            Sessions
           </button>
           <button id="nav-logout" type="button" class="btn btn-ghost">
             Log out
@@ -360,6 +363,154 @@
       </p>
     </section>
 
+    <!-- ==================================================================
+         Dashboard panel — Student progress overview
+         ================================================================== -->
+    <section id="dashboard-panel" class="panel" aria-labelledby="dashboard-heading" hidden>
+      <div class="dashboard-header">
+        <h1 id="dashboard-heading" class="panel-title">Your Study Dashboard</h1>
+        <button id="btn-dash-new-analysis" type="button" class="btn btn-primary">
+          New Analysis
+        </button>
+      </div>
+
+      <div id="dashboard-error" role="status" aria-live="assertive" class="alert alert-error" hidden></div>
+
+      <!-- Empty state — no completed analyses yet -->
+      <div id="dash-empty" class="empty-state" hidden>
+        <p>You haven't completed an analysis yet.</p>
+        <button type="button" class="btn btn-primary" onclick="document.getElementById('dashboard-panel').hidden=true;document.getElementById('upload-panel').hidden=false;">
+          Upload Your Study Material
+        </button>
+      </div>
+
+      <!-- Dashboard content — shown when at least one complete session exists -->
+      <div id="dash-content" hidden>
+
+        <!-- Course and score -->
+        <div class="dash-hero">
+          <div class="score-card" aria-label="Readiness score">
+            <div id="dash-score-value" class="score-value" aria-live="polite">—</div>
+            <div class="score-label">Exam Readiness</div>
+          </div>
+          <div class="dash-hero-info">
+            <div class="dash-course-label">Current course:</div>
+            <div id="dash-course-name" class="dash-course-name">—</div>
+            <div class="dash-actions">
+              <button id="btn-dash-view-report" type="button" class="btn btn-secondary">
+                View Full Report
+              </button>
+              <button id="btn-dash-open-tutor" type="button" class="btn btn-primary">
+                📚 Study with AI Tutor
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Score alerts -->
+        <div id="dash-alert-danger" role="alert" class="alert alert-danger" hidden>
+          Your readiness score is below 50%. Focus on missing topics before your exam.
+        </div>
+        <div id="dash-alert-caution" role="alert" class="alert alert-caution" hidden>
+          Your preparation is partial. Work through the knowledge gaps below.
+        </div>
+
+        <!-- Coverage summary -->
+        <div class="coverage-summary" aria-label="Coverage summary">
+          <div class="coverage-item">
+            <span id="dash-count-covered" class="coverage-count">—</span>
+            <span class="coverage-label">Covered</span>
+          </div>
+          <div class="coverage-item">
+            <span id="dash-count-partial" class="coverage-count">—</span>
+            <span class="coverage-label">Partial</span>
+          </div>
+          <div class="coverage-item">
+            <span id="dash-count-missing" class="coverage-count">—</span>
+            <span class="coverage-label">Missing</span>
+          </div>
+        </div>
+
+        <!-- Top knowledge gaps -->
+        <section aria-labelledby="dash-gaps-heading">
+          <h2 id="dash-gaps-heading">Top Knowledge Gaps</h2>
+          <div id="dash-gap-list" class="gaps-list" role="list"></div>
+        </section>
+
+        <!-- Revision plan summary -->
+        <section id="dash-revision-section" aria-labelledby="dash-revision-heading" hidden>
+          <h2 id="dash-revision-heading">Revision Plan</h2>
+          <p id="dash-revision-summary" class="revision-total"></p>
+        </section>
+
+        <!-- Recent sessions -->
+        <section aria-labelledby="dash-recent-heading">
+          <h2 id="dash-recent-heading">Recent Sessions</h2>
+          <div id="dash-recent-sessions" class="session-list" role="list"></div>
+        </section>
+
+      </div><!-- /#dash-content -->
+    </section>
+
+    <!-- ==================================================================
+         Tutor panel — AI Study Tutor chat interface
+         ================================================================== -->
+    <section id="tutor-panel" class="panel tutor-panel" aria-labelledby="tutor-heading" hidden>
+      <div class="tutor-header">
+        <div class="tutor-header-left">
+          <button id="btn-tutor-back" type="button" class="btn btn-ghost btn-icon" aria-label="Back">
+            ← Back
+          </button>
+          <h1 id="tutor-heading" class="panel-title">AI Study Tutor</h1>
+        </div>
+      </div>
+
+      <p class="panel-subtitle">
+        Ask questions about your uploaded study material. The tutor answers
+        based only on what you uploaded — it will tell you when a topic
+        is outside your material.
+      </p>
+
+      <div id="tutor-error" role="status" aria-live="assertive" class="alert alert-error" hidden></div>
+
+      <!-- Quick action prompts -->
+      <div id="tutor-quick-prompts" class="tutor-quick-prompts" aria-label="Quick actions">
+        <!-- Populated by tutor.js -->
+      </div>
+
+      <!-- Message thread -->
+      <div
+        id="tutor-messages"
+        class="tutor-messages"
+        role="log"
+        aria-live="polite"
+        aria-label="Conversation with AI Study Tutor"
+      >
+        <!-- Messages injected by tutor.js -->
+      </div>
+
+      <!-- Loading indicator -->
+      <div id="tutor-loading" class="tutor-loading" hidden aria-live="polite">
+        <span class="spinner" aria-hidden="true" style="width:20px;height:20px;border-width:3px;"></span>
+        <span>Thinking…</span>
+      </div>
+
+      <!-- Input area -->
+      <div class="tutor-input-row">
+        <label for="tutor-input" class="sr-only">Your message</label>
+        <textarea
+          id="tutor-input"
+          class="tutor-input"
+          placeholder="Ask a question about your study material… (Enter to send, Shift+Enter for new line)"
+          rows="2"
+          aria-label="Your message to the AI Study Tutor"
+        ></textarea>
+        <button id="btn-tutor-send" type="button" class="btn btn-primary" aria-label="Send message">
+          Send
+        </button>
+      </div>
+    </section>
+
   </main>
 
   <footer class="site-footer" role="contentinfo">
@@ -375,6 +526,8 @@
   <script type="module" src="/static/js/report.js"></script>
   <script type="module" src="/static/js/revisionPlan.js"></script>
   <script type="module" src="/static/js/history.js"></script>
+  <script type="module" src="/static/js/tutor.js"></script>
+  <script type="module" src="/static/js/dashboard.js"></script>
 
   <!-- Inline: set footer year without a module dependency -->
   <script>

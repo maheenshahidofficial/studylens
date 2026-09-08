@@ -14,6 +14,8 @@ from flask import Flask, g, jsonify, render_template, request
 import auth
 from auth import AuthError, ConflictError, ValidationError, require_auth
 from analyzer import PipelineError, PipelineTimeoutError, run_analysis
+import tutor as tutor_module
+from tutor import TutorContextError, TutorError, TutorMessageLimitError, TutorTimeoutError
 from db import close_db, get_db, init_db
 from extraction import ExtractionError, extract
 from utils import (
@@ -387,6 +389,98 @@ def create_app() -> Flask:
             "full_report": _parse(row["full_report_json"]),
             "revision_plan": _parse(row["revision_plan_json"]),
         }), 200
+
+    # -----------------------------------------------------------------------
+    # Task 20.1 — POST /api/sessions/<session_id>/tutor
+    # -----------------------------------------------------------------------
+
+    @app.route("/api/sessions/<session_id>/tutor", methods=["POST"])
+    @require_auth
+    def tutor_message(session_id):
+        """Send a message to the AI Study Tutor for a specific session.
+
+        The tutor's response is grounded in the student's uploaded study
+        material, syllabus, analysis results, and revision plan.
+        """
+        db = get_db()
+        student_id = g.current_user
+
+        # Load and authorise the session
+        session_row = db.execute(
+            "SELECT id, student_id, status FROM analysis_sessions WHERE id = ?",
+            (session_id,),
+        ).fetchone()
+
+        if session_row is None:
+            return jsonify({"error": "Not found"}), 404
+        if session_row["student_id"] != student_id:
+            return jsonify({"error": "Not found"}), 403  # intentionally vague
+        if session_row["status"] != "complete":
+            return jsonify({"error": "Analysis session is not complete"}), 400
+
+        # Parse and validate the request body
+        data = request.get_json(silent=True) or {}
+        message = data.get("message", "")
+        if not message or not str(message).strip():
+            return jsonify({"error": "message must be a non-empty string"}), 400
+
+        # Delegate to the tutor module
+        try:
+            result = tutor_module.get_tutor_response(session_id, str(message).strip(), db)
+            return jsonify(result), 200
+        except TutorMessageLimitError as exc:
+            return jsonify({"error": exc.message}), 429
+        except TutorTimeoutError as exc:
+            return jsonify({"error": exc.message}), 408
+        except (TutorError, TutorContextError) as exc:
+            app.logger.error("Tutor error for session %s: %s", session_id, exc)
+            return jsonify({"error": exc.message}), 500
+        except Exception as exc:
+            app.logger.exception("Unexpected tutor error for session %s", session_id)
+            return jsonify({"error": "An unexpected error occurred. Please try again."}), 500
+
+    # -----------------------------------------------------------------------
+    # Task 20.2 — GET /api/sessions/<session_id>/tutor/history
+    # -----------------------------------------------------------------------
+
+    @app.route("/api/sessions/<session_id>/tutor/history", methods=["GET"])
+    @require_auth
+    def tutor_history(session_id):
+        """Return the full conversation history for a tutor session."""
+        db = get_db()
+        student_id = g.current_user
+
+        # Load and authorise the session
+        session_row = db.execute(
+            "SELECT id, student_id FROM analysis_sessions WHERE id = ?",
+            (session_id,),
+        ).fetchone()
+
+        if session_row is None:
+            return jsonify({"error": "Not found"}), 404
+        if session_row["student_id"] != student_id:
+            return jsonify({"error": "Not found"}), 403  # intentionally vague
+
+        # Fetch all messages in chronological order (no limit — full history)
+        rows = db.execute(
+            """SELECT id, role, content, created_at
+               FROM tutor_messages
+               WHERE session_id = ?
+               ORDER BY created_at ASC""",
+            (session_id,),
+        ).fetchall()
+
+        messages = [
+            {
+                "id": row["id"],
+                "role": row["role"],
+                "content": row["content"],
+                "created_at": row["created_at"],
+            }
+            for row in rows
+        ]
+
+        return jsonify({"messages": messages}), 200
 
     # -----------------------------------------------------------------------
     # Task 4.3 — Global error handlers

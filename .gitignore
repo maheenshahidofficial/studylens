@@ -34,3 +34,14 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.log
+
+# Hypothesis example database
+.hypothesis/
+
+# Temporary test output files
+test_out.txt
+test_err.txt
+test_output.txt
+
+# Temporary secret generation script (not part of application)
+_gen_secret.py

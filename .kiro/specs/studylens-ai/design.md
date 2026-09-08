@@ -10,9 +10,9 @@ MVP stack:
 - **Database**: SQLite via plain `sqlite3` (no ORM)
 - **File storage**: Local filesystem, path-scoped per student and session
 - **Text extraction**: `pdfplumber` for embedded text; `pytesseract` + `pdf2image` for OCR fallback
-- **AI analysis**: OpenAI Chat Completions API — 2 structured calls cover the entire analysis pipeline
+- **AI analysis**: Groq API (OpenAI-compatible) via `openai` SDK — 2 structured calls for the analysis pipeline, additional calls for the AI Study Tutor and secondary features. Provider configured via `GROQ_API_KEY` and `GROQ_MODEL` env vars.
 
-The design is intentionally minimal: 4 database tables, 5 API endpoints, a synchronous pipeline, and no background workers. Every component is a plain Python module so future features (past-paper analysis, quizzes, flashcards, knowledge graph) can be added without restructuring the codebase.
+The design is intentionally minimal: 6 database tables, 8 API endpoints for the core MVP, a synchronous pipeline, and no background workers. Every component is a plain Python module so future features (past-paper analysis, quizzes, flashcards, knowledge graph) can be added without restructuring the codebase.
 
 ---
 
@@ -28,20 +28,24 @@ graph TD
     AUTH[auth.py\nRegister · Login · JWT]
     EE[extraction.py\npdfplumber / pytesseract]
     AA[analyzer.py\n2-call AI pipeline]
-    DB[(SQLite\n4 tables)]
+    TT[tutor.py\nAI Study Tutor]
+    DB[(SQLite\n6 tables)]
     FS[(File Storage\nLocal Filesystem)]
-    AI[OpenAI API]
+    AI[Groq API\n(OpenAI-compatible)]
 
     Student -->|HTTP| FE
     FE -->|REST/JSON| API
     API --> AUTH
     API --> EE
     API --> AA
+    API --> TT
     AUTH --> DB
     EE --> FS
     EE --> DB
     AA --> DB
+    TT --> DB
     AA -->|HTTPS| AI
+    TT -->|HTTPS| AI
 ```
 
 **Component responsibilities:**
@@ -52,6 +56,7 @@ graph TD
 | Auth | `auth.py` | Registration, login, JWT issue/verify |
 | Extraction Engine | `extraction.py` | PDF text extraction (direct + OCR) |
 | AI Analyzer | `analyzer.py` | 2-call AI pipeline: analysis + revision plan |
+| AI Study Tutor | `tutor.py` | Context-aware chat, quiz generation, viva mode |
 | SQLite helpers | `db.py` | Connection, schema init, parameterised queries |
 | Frontend | `static/` | Upload form, report rendering, session history |
 
@@ -104,6 +109,41 @@ Each call has a 60-second timeout. If the total pipeline exceeds 120 seconds, th
 
 ---
 
+### AI Study Tutor (`tutor.py`)
+
+Handles context-aware chat, quiz generation, and viva mode. Called by the API layer after loading the session's analysis data from SQLite.
+
+**Entry point:** `get_tutor_response(session_id, user_message, db) -> TutorResponse`
+
+**Context building (no vector database required):**
+1. Load `extracted_texts` for the session (syllabus + study material text)
+2. Load `full_report_json` for topic coverage and knowledge gaps
+3. Load last 10 tutor messages from `tutor_messages` for conversation history
+4. Build a system prompt that includes:
+   - The study material text (truncated to fit model context window)
+   - The syllabus text
+   - Topic coverage summary
+   - Top 5 knowledge gaps
+   - The revision plan summary
+   - Instruction to stay grounded in the uploaded material
+5. Send conversation history + user message to the Groq API
+
+**Context window management:**
+- Use `GROQ_MODEL` (default: `openai/gpt-oss-120b`) which has a 131K context window
+- Truncate study material text to 40,000 characters if needed
+- Truncate syllabus text to 10,000 characters if needed
+- Include the most recent 10 exchanges from conversation history
+
+**Quiz generation:** `generate_quiz(session_id, question_count, difficulty, question_type, db) -> QuizResult`
+- Builds prompt from syllabus + study material, prioritising weak topics
+- Returns structured JSON validated by a Pydantic `QuizModel`
+- Stores result in `session_artifacts`
+
+**Viva mode:** `start_viva(session_id, db) -> VivaQuestion` / `evaluate_viva_answer(session_id, answer, db) -> VivaFeedback`
+- Generates questions from analysis, evaluates answers, stores transcript
+
+---
+
 ## Data Models
 
 ### SQLite Schema (4 tables)
@@ -148,9 +188,28 @@ CREATE TABLE session_artifacts (
     payload_json  TEXT NOT NULL,
     created_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Tutor conversation messages (per analysis session)
+CREATE TABLE tutor_messages (
+    id          TEXT PRIMARY KEY,
+    session_id  TEXT NOT NULL REFERENCES analysis_sessions(id),
+    role        TEXT NOT NULL,   -- 'user' | 'assistant'
+    content     TEXT NOT NULL,
+    created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
 ```
 
 No ORM. All queries use `sqlite3` with parameterised placeholders (`?`). `db.py` exposes `get_db()` (returns a connection with `row_factory = sqlite3.Row`) and `init_db()` (runs `CREATE TABLE IF NOT EXISTS`).
+
+**Relationship map:**
+
+```
+User ──< AnalysisSession ──1 ExtractedText (×2)
+                          ──1 ReadinessReport (in full_report_json column)
+                          ──1 RevisionPlan (in revision_plan_json column)
+                          ──< TutorMessage
+                          ──< SessionArtifact  (quiz, viva, past_paper, knowledge_map)
+```
 
 ---
 
@@ -233,6 +292,58 @@ Headers: Authorization: Bearer <token>
 200 OK: { "session": {...}, "full_report": {...} | null, "revision_plan": {...} | null }
 403 Forbidden: session belongs to another student
 404 Not Found: session does not exist
+```
+
+---
+
+### AI Study Tutor
+
+```
+POST /api/sessions/<session_id>/tutor
+Headers: Authorization: Bearer <token>
+Body: { "message": string }
+
+200 OK: {
+  "response": string,
+  "session_id": string,
+  "message_id": string
+}
+400 Bad Request: missing or empty message
+401 Unauthorized: missing/invalid/expired token
+403 Forbidden: session belongs to another student
+404 Not Found: session not found or not complete
+408 Request Timeout: AI service did not respond within 60 s
+500 Internal Server Error: AI service error
+
+GET /api/sessions/<session_id>/tutor/history
+Headers: Authorization: Bearer <token>
+
+200 OK: {
+  "messages": [
+    { "id": string, "role": "user"|"assistant", "content": string, "created_at": string },
+    ...
+  ]
+}
+```
+
+### Secondary Features (Quiz, Viva, Past Paper)
+
+```
+POST /api/sessions/<session_id>/quiz
+Headers: Authorization: Bearer <token>
+Body: { "question_count": 1-20, "difficulty": "easy"|"medium"|"hard", "question_type": "mcq"|"short_answer" }
+
+200 OK: { "artifact_id": string, "quiz": { "questions": [...] } }
+
+POST /api/sessions/<session_id>/viva/start
+POST /api/sessions/<session_id>/viva/answer
+Body: { "answer": string }
+
+POST /api/sessions/<session_id>/past-paper
+Body: multipart/form-data — past_paper: <PDF file>
+
+GET /api/sessions/<session_id>/artifacts
+Returns list of all stored artifacts for the session
 ```
 
 ---
@@ -335,6 +446,35 @@ All interactive elements have `min-height: 44px` for touch targets. No horizonta
 
 > Full WCAG validation requires manual testing with assistive technologies and expert accessibility review beyond automated tooling.
 
+### New Frontend Panels
+
+**`#tutor-panel`** — AI Study Tutor chat interface
+- Chat message list (scrollable)
+- Message input with send button
+- Suggested prompts: "Explain this", "Simplify", "Give an example", "What should I study next?"
+- Rendered by `tutor.js`
+
+**`#dashboard-panel`** — Student Progress Dashboard (replaces or augments `#history-panel`)
+- Most recent readiness score
+- Recent session cards (up to 5)
+- Quick link to AI Tutor for most recent session
+- Revision plan summary
+
+**Secondary panels (deferred):**
+- `#quiz-panel` — quiz questions and answer submission
+- `#viva-panel` — viva mode conversation
+- `#knowledge-map-panel` — interactive concept graph
+
+### New JS Modules
+
+| Module | Responsibility |
+|---|---|
+| `tutor.js` | Send/receive tutor messages, render chat, load history |
+| `dashboard.js` | Render dashboard panel, link to tutor |
+| `quiz.js` (secondary) | Request and render quiz questions, submit answers |
+| `viva.js` (secondary) | Start viva session, submit answers, render feedback |
+| `knowledgeMap.js` (secondary) | Render knowledge map nodes using lightweight SVG/canvas |
+
 ---
 
 ## Security Design
@@ -389,6 +529,10 @@ Six error types covering the full HTTP surface:
 | Duplicate email on registration | 409 | `{"error": "Email already registered"}` |
 | Too many concurrent sessions | 429 | `{"error": "Maximum of 5 concurrent sessions reached"}` |
 | Extraction or AI pipeline failure | 500 | `{"error": "<stage-specific message>"}` |
+| AI tutor did not respond within 60 s (`TUTOR_TIMEOUT`) | 408 | `{"error": "AI tutor request timed out"}` |
+| Session context could not be loaded for tutor (`TUTOR_CONTEXT_ERROR`) | 500 | `{"error": "Could not load session context for tutor"}` |
+| Artifact limit (10) per session reached (`ARTIFACT_LIMIT`) | 429 | `{"error": "Artifact limit reached for this session"}` |
+| Tutor message limit (100) per session reached (`MESSAGE_LIMIT`) | 429 | `{"error": "Message limit reached for this session"}` |
 
 **Pipeline failure handling:**
 - The session row is updated to `status=failed` with a `failure_reason` before the 500 is returned.
@@ -446,6 +590,22 @@ Six error types covering the full HTTP surface:
 *For any* Analysis Session owned by student A, an authenticated request by student B for that session's identifier SHALL return HTTP 403, regardless of whether the session exists or its content.
 
 **Validates: Requirements 9.4**
+
+---
+
+### Property 34: Tutor Response Never Modifies the Parent Analysis Session
+
+*For any* tutor message request that succeeds or fails, the `full_report_json`, `revision_plan_json`, `readiness_score`, and `coverage_summary_json` columns of the parent `analysis_sessions` row SHALL remain unchanged after the request.
+
+**Validates: Requirements 18.2**
+
+---
+
+### Property 35: Tutor Message Limit Enforced
+
+*For any* authenticated student who already has 100 or more TutorMessage rows for a given session, a new tutor message request for that session SHALL return HTTP 429 without storing a new message.
+
+**Validates: Requirements 18.4**
 
 ---
 
@@ -534,7 +694,8 @@ The MVP deploys as a single web service on [Render](https://render.com).
 **Environment variables** (set in Render dashboard):
 ```
 JWT_SECRET=<random 64-char hex string>
-OPENAI_API_KEY=<your key>
+GROQ_API_KEY=<your Groq key>
+GROQ_MODEL=openai/gpt-oss-120b
 UPLOAD_ROOT=/data/uploads
 DATABASE_URL=/data/studylens.db
 FLASK_ENV=production
@@ -563,10 +724,10 @@ The modular file structure makes future features straightforward additions:
 
 | Future feature | New module | Hook point |
 |---|---|---|
-| Past-paper analysis | `past_paper.py` | New endpoint `POST /api/past-paper`, stores result in `session_artifacts` |
-| Auto-generated quizzes | `quiz.py` | Third AI call, result in `session_artifacts` |
+| Past-paper analysis | `past_paper.py` or `tutor.py` | `POST /api/sessions/<id>/past-paper`, stores in `session_artifacts` with adjusted priorities |
+| Auto-generated quizzes | `tutor.py` | `POST /api/sessions/<id>/quiz`, stores in `session_artifacts` |
 | Flashcard generation | `flashcards.py` | Fourth AI call, result in `session_artifacts` |
-| Viva/interview questions | `viva.py` | Fifth AI call, result in `session_artifacts` |
-| Interactive knowledge graph | `graph.py` | Post-process topics + gaps into a graph structure |
+| Viva/interview questions | `tutor.py` | `POST /api/sessions/<id>/viva/start`, stores transcript in `session_artifacts` |
+| Interactive knowledge graph | `tutor.py` or `analyzer.py` | `GET /api/sessions/<id>/artifacts`, stores node/edge JSON in `session_artifacts` |
 
 The `session_artifacts` table is already in the schema to hold arbitrary JSON payloads per session without schema migrations.

@@ -46,6 +46,8 @@ function _showPanel(panelId) {
     'progress-panel',
     'report-panel',
     'history-panel',
+    'tutor-panel',
+    'dashboard-panel',
   ];
   panels.forEach((id) => {
     const el = document.getElementById(id);
@@ -170,6 +172,15 @@ function _bindNavControls() {
     });
   }
 
+  // "Dashboard" button in nav → show dashboard panel
+  const navShowDashboard = document.getElementById('nav-show-dashboard');
+  if (navShowDashboard) {
+    navShowDashboard.addEventListener('click', () => {
+      _showPanel('dashboard-panel');
+      if (window.loadDashboard) window.loadDashboard();
+    });
+  }
+
   // "Log out" button
   const navLogout = document.getElementById('nav-logout');
   if (navLogout) {
@@ -279,10 +290,13 @@ export async function login(email, password) {
 
     // Update UI to authenticated state
     _showAuthenticatedNav();
-    _showPanel('upload-panel');
+    _showPanel('dashboard-panel');
 
-    // Attempt to trigger history load if history.js has already wired up
-    // (history.js will call loadHistory() on its own init; no dependency here)
+    // Load the dashboard if dashboard.js has already initialised
+    if (window.loadDashboard) {
+      window.loadDashboard();
+    }
+
     return true;
   }
 
@@ -363,7 +377,11 @@ function _init() {
   // Restore authenticated state on page reload if token is present
   if (getToken()) {
     _showAuthenticatedNav();
-    _showPanel('upload-panel');
+    _showPanel('dashboard-panel');
+    // Load the dashboard; dashboard.js may not be ready yet on first tick
+    setTimeout(() => {
+      if (window.loadDashboard) window.loadDashboard();
+    }, 0);
   }
 }
 

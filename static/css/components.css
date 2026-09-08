@@ -619,3 +619,298 @@ input[type="file"] {
     font-size: var(--font-size-2xl);
   }
 }
+
+/* ==========================================================================
+   Tasks 23.1 & 23.2 — Tutor panel and Dashboard component styles
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Dashboard layout
+   -------------------------------------------------------------------------- */
+
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.dash-hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-6);
+  margin-bottom: var(--space-6);
+  padding: var(--space-5);
+  background-color: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.dash-hero .score-card {
+  /* Override the centred/full-width default for inline use */
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.dash-hero-info {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.dash-course-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.dash-course-name {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.dash-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+/* Knowledge gap item inside dashboard */
+.dash-gap-item {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-2);
+}
+
+.dash-recent-card {
+  cursor: pointer;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast),
+              transform var(--transition-fast);
+}
+
+.dash-recent-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 12px var(--color-shadow);
+  transform: translateY(-1px);
+}
+
+/* --------------------------------------------------------------------------
+   Tutor panel layout
+   -------------------------------------------------------------------------- */
+
+.tutor-panel {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 120px);
+  padding: var(--space-5);
+}
+
+.tutor-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.tutor-header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex: 1;
+}
+
+.btn-icon {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--font-size-sm);
+}
+
+/* Quick prompt buttons */
+.tutor-quick-prompts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.btn-quick-prompt {
+  display: inline-block;
+  padding: var(--space-1) var(--space-3);
+  background-color: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  border: 1.5px solid var(--color-primary);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+  white-space: nowrap;
+  min-height: var(--touch-target);
+}
+
+.btn-quick-prompt:hover {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+/* Message thread */
+.tutor-messages {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 240px;
+  max-height: 400px;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-alt);
+  margin-bottom: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Individual message wrapper */
+.tutor-message {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  max-width: 82%;
+}
+
+.tutor-message--user {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.tutor-message--assistant {
+  align-self: flex-start;
+  align-items: flex-start;
+}
+
+.tutor-message-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  padding: 0 var(--space-1);
+}
+
+.tutor-message-bubble {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-base);
+  line-height: 1.65;
+  word-break: break-word;
+}
+
+.tutor-message--user .tutor-message-bubble {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  border-bottom-right-radius: var(--radius-sm);
+}
+
+.tutor-message--assistant .tutor-message-bubble {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-bottom-left-radius: var(--radius-sm);
+}
+
+/* Loading indicator */
+.tutor-loading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-2);
+  min-height: 28px;
+}
+
+/* Input row */
+.tutor-input-row {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-end;
+}
+
+.tutor-input {
+  flex: 1;
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  resize: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  min-height: calc(var(--touch-target) + 8px);
+  line-height: 1.5;
+}
+
+.tutor-input:focus {
+  outline: none;
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.tutor-input:disabled {
+  opacity: 0.55;
+  background-color: var(--color-surface-alt);
+}
+
+/* --------------------------------------------------------------------------
+   Mobile responsive overrides for tutor and dashboard
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 375px) {
+  .dash-hero {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .dash-hero .score-card {
+    width: 110px;
+    height: 110px;
+  }
+
+  .dash-actions {
+    justify-content: center;
+  }
+
+  .tutor-messages {
+    max-height: 280px;
+    min-height: 180px;
+  }
+
+  .tutor-message {
+    max-width: 94%;
+  }
+
+  .tutor-quick-prompts {
+    gap: var(--space-1);
+  }
+
+  .btn-quick-prompt {
+    font-size: 0.78rem;
+    padding: var(--space-1) var(--space-2);
+  }
+}

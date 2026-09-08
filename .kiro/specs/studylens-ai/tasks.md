@@ -2,7 +2,7 @@
 
 ## Overview
 
-Build a Python/Flask web application that analyses a student's PDF study material against their course syllabus and produces an exam-readiness report with a personalised revision plan. The implementation follows a clean layered structure: project scaffolding → database → auth → file upload → text extraction → AI analysis → API wiring → frontend → tests → deployment.
+Build StudyLens AI — a Python/Flask Study Intelligence Platform that analyses a student's PDF study material against their course syllabus, produces an exam-readiness report with a personalised revision plan, and provides a context-aware AI Study Tutor grounded in the student's uploaded material. The implementation follows a clean layered structure: project scaffolding → database → auth → file upload → text extraction → AI analysis → API wiring → frontend → tests → deployment.
 
 ---
 
@@ -232,8 +232,8 @@ Build a Python/Flask web application that analyses a student's PDF study materia
     - Form input and button styles meeting touch-target size requirement
     - _Requirements: 10.1, 10.7_
 
-- [ ] 15. Property-based tests — Hypothesis (6 properties)
-  - [ ]* 15.1 Write property test for Property 1 — Readiness Score formula
+- [x] 15. Property-based tests — Hypothesis (6 properties)
+  - [x]* 15.1 Write property test for Property 1 — Readiness Score formula
     - Use `@given(total=st.integers(1,200), covered=st.integers(0,200))` with `covered = min(covered, total)`
     - Assert `compute_readiness_score(covered, total) == round((covered / total) * 100)`
     - `@settings(max_examples=100)`
@@ -241,14 +241,14 @@ Build a Python/Flask web application that analyses a student's PDF study materia
     - **Validates: Requirements 7.2**
     - _Requirements: 7.2_
 
-  - [ ]* 15.2 Write property test for Property 2 — Coverage counts sum to total
+  - [x]* 15.2 Write property test for Property 2 — Coverage counts sum to total
     - Use `@given(st.lists(st.sampled_from(["covered","partially_covered","missing"]), min_size=1, max_size=200))`
     - Assert `summary["covered"] + summary["partially_covered"] + summary["missing"] == summary["total"]`
     - **Property 2: Coverage Counts Sum to Total**
     - **Validates: Requirements 5.5**
     - _Requirements: 5.5_
 
-  - [ ]* 15.3 Write property test for Property 3 — Knowledge Gap six-tier priority order
+  - [x]* 15.3 Write property test for Property 3 — Knowledge Gap six-tier priority order
     - Define a `gap_strategy()` composite strategy producing dicts with random `coverage_status` and `importance`
     - Use `@given(st.lists(gap_strategy(), min_size=1, max_size=50))`
     - Assert for every adjacent pair in `rank_knowledge_gaps(gaps)` that `priority_tier(ranked[i]) <= priority_tier(ranked[i+1])`
@@ -256,7 +256,7 @@ Build a Python/Flask web application that analyses a student's PDF study materia
     - **Validates: Requirements 6.2, 8.2**
     - _Requirements: 6.2, 8.2_
 
-  - [ ]* 15.4 Write property test for Property 4 — Revision plan total equals sum of durations
+  - [x]* 15.4 Write property test for Property 4 — Revision plan total equals sum of durations
     - Define a `task_strategy()` composite strategy producing dicts with random `duration_minutes`
     - Use `@given(st.lists(task_strategy(), min_size=0, max_size=200))`
     - Assert `plan["total_minutes"] == sum(t["duration_minutes"] for t in tasks)`
@@ -264,13 +264,13 @@ Build a Python/Flask web application that analyses a student's PDF study materia
     - **Validates: Requirements 8.5**
     - _Requirements: 8.5_
 
-  - [ ]* 15.5 Write unit test for Property 5 — Passwords never stored in plaintext
+  - [x]* 15.5 Write unit test for Property 5 — Passwords never stored in plaintext
     - Call `auth.register()` with a known password; query `users` table directly; assert stored `password_hash != password` and `password_hash.startswith("$2b$")`
     - **Property 5: Passwords Are Never Stored in Plaintext**
     - **Validates: Requirements 1.5**
     - _Requirements: 1.5_
 
-  - [ ]* 15.6 Write unit test for Property 6 — Cross-student session access returns 403
+  - [x]* 15.6 Write unit test for Property 6 — Cross-student session access returns 403
     - Register two users A and B; have user A create a session; authenticate as user B and GET `/api/sessions/<session_id>`; assert 403 and body `{"error": "Not found"}`
     - **Property 6: Cross-Student Session Access Returns 403**
     - **Validates: Requirements 9.4**
@@ -323,6 +323,130 @@ Build a Python/Flask web application that analyses a student's PDF study materia
     - Attach a persistent disk mounted at `/data`
     - _Requirements: all (deployment prerequisite)_
 
+- [x] 18. Database schema extension — tutor messages table
+  - [x] 18.1 Add `tutor_messages` table to `db.py`
+    - Add `CREATE TABLE IF NOT EXISTS tutor_messages (id TEXT PRIMARY KEY, session_id TEXT NOT NULL REFERENCES analysis_sessions(id), role TEXT NOT NULL, content TEXT NOT NULL, created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP)` to `init_db()`
+    - Verify `session_artifacts` table is already created by `init_db()` (it was defined in Task 2.1)
+    - Add helper `get_tutor_messages(session_id, limit=10) -> list` — returns the most recent N messages ordered by `created_at` ASC
+    - Add helper `save_tutor_message(session_id, role, content) -> str` — inserts a row, returns the new message UUID
+    - Add helper `count_tutor_messages(session_id) -> int` — returns message count for rate-limit enforcement
+    - Use parameterised `?` placeholders throughout; no raw SQL string concatenation
+    - _Requirements: 12.4, 12.9, 18.4_
+
+- [x] 19. AI Study Tutor backend (`tutor.py`)
+  - [x] 19.1 Create `tutor.py` module with context-building and response generation
+    - Define `TutorContext` dataclass: `syllabus_text`, `study_material_text`, `coverage_summary`, `knowledge_gaps`, `revision_plan`, `conversation_history`
+    - Implement `build_tutor_context(session_id, db) -> TutorContext` — loads extracted texts, full_report_json, revision_plan_json, and last 10 tutor messages from DB
+    - Build system prompt grounding the tutor in the student's material; instruct the model to acknowledge when a topic is not in the uploaded material
+    - Truncate study material to 40,000 chars and syllabus to 10,000 chars if they exceed those limits
+    - Handle "What should I study next?" by deriving the answer from ranked knowledge gaps
+    - _Requirements: 12.2, 12.3, 12.5, 12.6, 12.7_
+
+  - [x] 19.2 Implement `get_tutor_response(session_id, user_message, db) -> dict`
+    - Call `build_tutor_context()` to load session context
+    - Check `count_tutor_messages(session_id)` ≥ 100; if so raise `TutorMessageLimitError(429)`
+    - Call Groq API using the same `openai.OpenAI(api_key=..., base_url=...)` pattern from `analyzer.py` with 60-second timeout
+    - On success: call `save_tutor_message(session_id, 'user', user_message)` and `save_tutor_message(session_id, 'assistant', response_text)`
+    - Return `{"response": response_text, "session_id": session_id, "message_id": assistant_message_id}`
+    - On `APITimeoutError` / `APIConnectionError`: raise `TutorTimeoutError(408)` without saving messages
+    - On `APIError`: raise `TutorError(500)` without saving messages
+    - Never modify `analysis_sessions.full_report_json`, `revision_plan_json`, `readiness_score`, or `coverage_summary_json`
+    - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.8, 12.9, 18.1, 18.2, 18.3_
+
+- [x] 20. AI Study Tutor API endpoints (`app.py`)
+  - [x] 20.1 Implement `POST /api/sessions/<session_id>/tutor`
+    - Apply `@require_auth`; load session; return 404 if not found, 403 if wrong student, 400 if session not `complete`
+    - Parse JSON body; validate `message` field is non-empty string; return 400 if missing
+    - Call `tutor.get_tutor_response(session_id, message, db)`
+    - Catch `TutorMessageLimitError` → 429, `TutorTimeoutError` → 408, `TutorError` → 500
+    - Return 200 with tutor response JSON
+    - _Requirements: 12.1, 12.8, 12.10, 18.3, 18.4_
+
+  - [x] 20.2 Implement `GET /api/sessions/<session_id>/tutor/history`
+    - Apply `@require_auth`; load session; return 404/403 as appropriate
+    - Query `tutor_messages WHERE session_id = ? ORDER BY created_at ASC`
+    - Return `{"messages": [...]}` with `id`, `role`, `content`, `created_at` fields
+    - _Requirements: 12.4_
+
+- [x] 21. AI Study Tutor frontend (`tutor.js`, `index.html` update)
+  - [x] 21.1 Add `#tutor-panel` section to `index.html`
+    - Add a new panel with: session context header (course name, readiness score), scrollable message list (`#tutor-messages`), text input (`#tutor-input`), send button (`#btn-tutor-send`)
+    - Add four quick-prompt buttons: "Explain this", "Simplify", "Give an example", "What should I study next?"
+    - All interactive elements must have `<label>` or `aria-label`; message list uses `role="log"` live region
+    - Add link from `#report-panel` to the tutor panel for the same session
+    - _Requirements: 12.6, 10.1, 10.7_
+
+  - [x] 21.2 Implement `tutor.js`
+    - `openTutor(sessionId)` — load tutor history via `GET /api/sessions/<id>/tutor/history`, render messages in `#tutor-messages`, show tutor panel
+    - `sendTutorMessage(sessionId, message)` — POST to `/api/sessions/<id>/tutor`, append user message immediately (optimistic), append AI response on success
+    - Wire send button click and Enter key to `sendTutorMessage`
+    - Wire quick-prompt buttons to pre-fill and submit the message input
+    - On error: display human-readable message in the panel; never show raw HTTP codes
+    - Export `openTutor` for use by `report.js` and `dashboard.js`
+    - _Requirements: 12.1, 12.6, 10.6_
+
+- [x] 22. Student Progress Dashboard (`dashboard.js`, `index.html` update)
+  - [x] 22.1 Add `#dashboard-panel` section to `index.html`
+    - Add panel showing: readiness score for most recent session, coverage summary (covered/partial/missing counts), top 3 knowledge gaps list, revision plan summary (total minutes, task count), recent sessions list (up to 5 cards), "Open AI Tutor" button, "New Analysis" button
+    - Show prompt to upload study material if no complete session exists
+    - _Requirements: 17.1, 17.2, 17.3, 17.4, 17.5_
+
+  - [x] 22.2 Implement `dashboard.js`
+    - `loadDashboard()` — GET `/api/sessions`; find the most recent complete session; render all dashboard elements
+    - Render readiness score with appropriate danger/caution/good colour class
+    - Render recent session cards (reuse session-card pattern from `history.js`)
+    - Wire "Open AI Tutor" button to `openTutor(sessionId)` from `tutor.js`
+    - Wire nav button `#nav-show-dashboard` to show dashboard panel and call `loadDashboard()`
+    - Export `loadDashboard`
+    - _Requirements: 17.1, 17.2, 17.3, 17.4, 17.5, 17.6_
+
+  - [x] 22.3 Update navigation in `index.html` and `auth.js`
+    - Add `#nav-show-dashboard` button to `#nav-user-links`
+    - After login success in `auth.js`, show `#dashboard-panel` instead of `#upload-panel` as the post-login default
+    - _Requirements: 17.1, 10.6_
+
+- [x] 23. CSS — tutor and dashboard components
+  - [x] 23.1 Add tutor chat styles to `components.css`
+    - `.tutor-messages` — scrollable message list container with max-height
+    - `.tutor-message--user` / `.tutor-message--assistant` — distinct visual styles for each role
+    - `.tutor-quick-prompts` — flex row of quick-prompt buttons
+    - `.tutor-input-row` — input + send button layout
+    - _Requirements: 10.1, 10.7_
+
+  - [x] 23.2 Add dashboard styles to `components.css`
+    - `.dashboard-summary` — readiness score + coverage summary row
+    - `.dashboard-recent` — recent sessions list
+    - `.dashboard-empty` — empty state prompt
+    - _Requirements: 10.1, 10.7_
+
+- [ ] 24. Secondary features — Quiz, Viva, Past Paper (DEFERRED — implement after core MVP)
+  - [ ]* 24.1 Implement quiz generation in `tutor.py`
+    - `generate_quiz(session_id, question_count, difficulty, question_type, db) -> dict`
+    - Build prompt from study material text prioritising `missing`/`partially_covered` topics
+    - Validate response with Pydantic `QuizModel`; store in `session_artifacts` with `artifact_type='quiz'`
+    - Add `POST /api/sessions/<id>/quiz` endpoint in `app.py`
+    - Add `quiz.js` frontend module for rendering and answering quiz questions
+    - _Requirements: 13.1, 13.2, 13.3, 13.4, 13.5_
+
+  - [ ]* 24.2 Implement viva mode in `tutor.py`
+    - `start_viva(session_id, db) -> dict` — generate opening question; store viva state in `session_artifacts`
+    - `evaluate_viva_answer(session_id, answer, db) -> dict` — evaluate answer, return feedback and follow-up
+    - Add `POST /api/sessions/<id>/viva/start` and `POST /api/sessions/<id>/viva/answer` endpoints
+    - Add `viva.js` frontend module
+    - _Requirements: 14.1, 14.2, 14.3, 14.4, 14.5_
+
+  - [ ]* 24.3 Implement past paper analysis in `tutor.py` or `analyzer.py`
+    - Accept past paper PDF upload via `POST /api/sessions/<id>/past-paper`
+    - Extract text using existing `extraction.py`; call AI to identify tested topics
+    - Produce adjusted revision priority list; store as `session_artifacts` with `artifact_type='past_paper_analysis'`
+    - _Requirements: 15.1, 15.2, 15.3, 15.4, 15.5_
+
+  - [ ]* 24.4 Implement knowledge map generation and rendering
+    - Generate node/edge JSON from existing topics and relationships via AI; store as `session_artifact`
+    - Add `GET /api/sessions/<id>/artifacts` endpoint
+    - Add `knowledgeMap.js` to render the graph using lightweight SVG/Canvas
+    - _Requirements: 16.1, 16.2, 16.3, 16.4, 16.5_
+
 ---
 
 ## Notes
@@ -333,6 +457,11 @@ Build a Python/Flask web application that analyses a student's PDF study materia
 - Property-based tests (15.1–15.4) use Hypothesis with `max_examples=100`; Properties 5 and 6 are unit tests because their input spaces are small and deterministic.
 - The `session_artifacts` table is created in task 2.1 but not used in any MVP endpoint — it is reserved for future features (quizzes, flashcards, past papers).
 - `UPLOAD_ROOT` and `DATABASE_URL` default to relative paths for local dev; in production they point to the Render persistent disk at `/data`.
+- Tasks 18–23 are core MVP additions. Implement after Tasks 1–17 are verified working.
+- Task 24 subtasks are marked `*` (optional/secondary). Implement after Tasks 18–23 are stable.
+- `tutor.py` reuses the same Groq API pattern from `analyzer.py` — no new AI provider setup needed.
+- Context-building in Task 19 uses plain SQL queries; no vector database or embedding infrastructure is required.
+- The `session_artifacts` table (created in Task 2.1) is ready for use by Tasks 24.1–24.4 with no schema migration needed.
 
 ## Task Dependency Graph
 
@@ -359,7 +488,16 @@ Build a Python/Flask web application that analyses a student's PDF study materia
     { "id": 17, "tasks": ["13.1"] },
     { "id": 18, "tasks": ["15.1", "15.2", "15.3", "15.4", "15.5", "15.6", "16.1", "16.2", "16.3", "16.4", "16.5", "16.6"] },
     { "id": 19, "tasks": ["17.1"] },
-    { "id": 20, "tasks": ["17.2"] }
+    { "id": 20, "tasks": ["17.2"] },
+    { "id": 21, "tasks": ["18.1"] },
+    { "id": 22, "tasks": ["19.1"] },
+    { "id": 23, "tasks": ["19.2"] },
+    { "id": 24, "tasks": ["20.1", "20.2"] },
+    { "id": 25, "tasks": ["21.1"] },
+    { "id": 26, "tasks": ["21.2"] },
+    { "id": 27, "tasks": ["22.1"] },
+    { "id": 28, "tasks": ["22.2", "22.3", "23.1", "23.2"] },
+    { "id": 29, "tasks": ["24.1", "24.2", "24.3", "24.4"] }
   ]
 }
 ```
