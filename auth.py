@@ -1,4 +1,4 @@
-import os
+﻿import os
 import re
 import uuid
 import datetime
@@ -47,6 +47,15 @@ class AuthError(Exception):
 
 _EMAIL_RE = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
 
+# bcrypt has a hard 72-byte limit; passwords are truncated to this length
+# before hashing so the validation window (8-128 chars) remains intact.
+_BCRYPT_MAX_BYTES = 72
+
+
+def _bcrypt_password(password: str) -> bytes:
+    """Return UTF-8 encoded password truncated to bcrypt's 72-byte limit."""
+    return password.encode("utf-8")[:_BCRYPT_MAX_BYTES]
+
 
 def register(email: str, password: str) -> None:
     """Register a new user with the given email and password.
@@ -75,8 +84,10 @@ def register(email: str, password: str) -> None:
     if row is not None:
         raise ConflictError("Email already registered.")
 
-    # 4. Hash password
-    password_hash = bcrypt.generate_password_hash(password, rounds=12).decode("utf-8")
+    # 4. Hash password — truncate to 72 bytes before bcrypt
+    password_hash = bcrypt.generate_password_hash(
+        _bcrypt_password(password), rounds=12
+    ).decode("utf-8")
 
     # 5. Insert user
     user_id = str(uuid.uuid4())
@@ -113,8 +124,8 @@ def login(email: str, password: str) -> str:
     user_id: str = row["id"]
     stored_hash: str = row["password_hash"]
 
-    # 2. Verify password
-    if not bcrypt.check_password_hash(stored_hash, password):
+    # 2. Verify password — truncate to 72 bytes to match registration hashing
+    if not bcrypt.check_password_hash(stored_hash, _bcrypt_password(password)):
         raise AuthError("Invalid credentials.")
 
     # 3. Build JWT
@@ -138,7 +149,7 @@ def require_auth(f):
     """Flask route decorator that enforces JWT bearer-token authentication.
 
     Reads the ``Authorization`` header, validates the bearer token, and
-    stores the authenticated user's ID in ``flask.g.current_user`` before
+    stores the authenticated user''s ID in ``flask.g.current_user`` before
     delegating to the wrapped view function.
 
     Returns HTTP 401 JSON responses for missing/invalid tokens and for

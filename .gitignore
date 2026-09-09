@@ -24,8 +24,8 @@ uploads/
 # Pytest cache
 .pytest_cache/
 
-# Kiro IDE local files (optional — remove if you want to commit specs)
-# .kiro/
+# Hypothesis example database
+.hypothesis/
 
 # OS files
 .DS_Store
@@ -35,13 +35,17 @@ Thumbs.db
 *.tmp
 *.log
 
-# Hypothesis example database
-.hypothesis/
-
 # Temporary test output files
-test_out.txt
-test_err.txt
-test_output.txt
+test_*.txt
+test_*.log
 
-# Temporary secret generation script (not part of application)
+# Temporary bat/helper scripts from development
+run_tests.bat
+run_all.bat
+ft.bat
+ft.py
+fix_tasks.py
+cleanup.bat
+
+# Temporary secret generation script
 _gen_secret.py

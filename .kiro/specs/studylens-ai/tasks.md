@@ -276,35 +276,35 @@ Build StudyLens AI — a Python/Flask Study Intelligence Platform that analyses 
     - **Validates: Requirements 9.4**
     - _Requirements: 9.4_
 
-- [ ] 16. Unit tests — pytest
-  - [ ]* 16.1 Write unit tests for auth registration (`test_auth.py`)
+- [x] 16. Unit tests — pytest
+  - [x]* 16.1 Write unit tests for auth registration (`test_auth.py`)
     - Duplicate email → 409; password at boundaries (7, 8, 128, 129 chars); malformed email formats (no @, no domain, leading dot)
     - _Requirements: 1.1, 1.2, 1.3, 1.4_
 
-  - [ ]* 16.2 Write unit tests for auth login (`test_auth.py`)
+  - [x]* 16.2 Write unit tests for auth login (`test_auth.py`)
     - Correct credentials → JWT with valid `exp` field; wrong password → 401; unknown email → 401; same 401 message for both failures
     - Expired token → 401 with "Session expired" message
     - _Requirements: 1.6, 1.7, 1.9_
 
-  - [ ]* 16.3 Write unit tests for file upload validation (`test_endpoints.py`)
+  - [x]* 16.3 Write unit tests for file upload validation (`test_endpoints.py`)
     - Missing `study_material` field → 400 identifying missing field; missing `syllabus` field → 400; non-PDF magic bytes → 415; file exactly 20 MiB → accepted; file 20 MiB + 1 byte → 413
     - Unauthenticated upload → 401
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.8_
 
-  - [ ]* 16.4 Write unit tests for extraction engine (`test_extraction.py`)
+  - [x]* 16.4 Write unit tests for extraction engine (`test_extraction.py`)
     - Embedded-text PDF → no OCR called, text returned; image-only PDF → OCR called; mixed PDF → both paths used, results concatenated
     - All pages failed → `ExtractionError`; `char_count < 100` → low-content warning present; page count > 500 → error
     - Some pages failed → partial-extraction warning with correct failed-page count
     - _Requirements: 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9_
 
-  - [ ]* 16.5 Write unit tests for AI analyzer (`test_analyzer.py`)
+  - [x]* 16.5 Write unit tests for AI analyzer (`test_analyzer.py`)
     - Mock OpenAI client; verify Call 1 and Call 2 are made in sequence
     - `openai.Timeout` on Call 1 → session marked failed, 500 returned
     - Invalid JSON from AI → `PipelineError` raised
     - Sparse syllabus (< 3 topics) → warning recorded in session
     - _Requirements: 4.5, 4.6, 4.7, 11.2, 11.3_
 
-  - [ ]* 16.6 Write unit tests for session history endpoints (`test_endpoints.py`)
+  - [x]* 16.6 Write unit tests for session history endpoints (`test_endpoints.py`)
     - Sessions returned descending by `created_at`; capped at 100; returns empty list with no sessions
     - 403 on cross-student access (response body intentionally vague); 404 for unknown session ID
     - _Requirements: 9.1, 9.2, 9.4, 9.5_

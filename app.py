@@ -1,7 +1,6 @@
 import datetime
 import json
 import os
-import threading
 import uuid
 
 from dotenv import load_dotenv
@@ -277,47 +276,32 @@ def create_app() -> Flask:
     def list_sessions():
         """Return up to 100 analysis sessions for the authenticated student.
 
-        Runs the database query in a background thread so we can enforce a
-        5-second timeout without relying on Unix-only signal.alarm.  If the
-        query does not complete within 5 seconds, 503 is returned with no
-        partial data.
+        Uses a direct synchronous SQLite query.  The background-thread approach
+        was removed because SQLite connections are not safe to share across
+        threads — the spawned thread could not use the flask.g connection from
+        the request thread, causing every request to time out and return 503.
+        A plain SQLite query on a local database completes in milliseconds; no
+        timeout wrapper is needed.
         """
         student_id = g.current_user
         db = get_db()
 
-        rows_holder = {}
-        error_holder = {}
-
-        def _run_query():
-            try:
-                rows = db.execute(
-                    """SELECT id, course_name, created_at, status,
-                              readiness_score, coverage_summary_json
-                       FROM analysis_sessions
-                       WHERE student_id = ?
-                       ORDER BY created_at DESC
-                       LIMIT 100""",
-                    (student_id,),
-                ).fetchall()
-                rows_holder["rows"] = rows
-            except Exception as exc:  # noqa: BLE001
-                error_holder["exc"] = str(exc)
-
-        t = threading.Thread(target=_run_query, daemon=True)
-        t.start()
-        t.join(timeout=5.0)
-
-        if t.is_alive():
-            # Query exceeded 5 seconds — return 503 with no partial data
-            return jsonify(
-                {"error": "Session history is temporarily unavailable. Please try again."}
-            ), 503
-
-        if "exc" in error_holder:
+        try:
+            rows = db.execute(
+                """SELECT id, course_name, created_at, status,
+                          readiness_score, coverage_summary_json
+                   FROM analysis_sessions
+                   WHERE student_id = ?
+                   ORDER BY created_at DESC
+                   LIMIT 100""",
+                (student_id,),
+            ).fetchall()
+        except Exception as exc:
+            app.logger.error("Error fetching sessions for student %s: %s", student_id, exc)
             return jsonify({"error": "Could not retrieve session history."}), 503
 
         sessions = []
-        for row in rows_holder.get("rows", []):
+        for row in rows:
             coverage_summary = None
             if row["coverage_summary_json"]:
                 try:
@@ -481,6 +465,71 @@ def create_app() -> Flask:
         ]
 
         return jsonify({"messages": messages}), 200
+
+    # -----------------------------------------------------------------------
+    # POST /api/tutor/chat — convenience alias accepting session_id in body
+    # -----------------------------------------------------------------------
+
+    @app.route("/api/tutor/chat", methods=["POST"])
+    @require_auth
+    def tutor_chat():
+        """Convenience endpoint: POST /api/tutor/chat with session_id in body.
+
+        Accepts:
+            {"message": "...", "session_id": "..."}
+
+        Validates input, enforces session ownership, and delegates to the
+        same tutor logic as /api/sessions/<session_id>/tutor.
+        Never exposes API keys, secrets, or stack traces in responses.
+        """
+        db = get_db()
+        student_id = g.current_user
+
+        data = request.get_json(silent=True)
+        if not data:
+            return jsonify({"success": False, "error": "Invalid or missing JSON body"}), 400
+
+        message = data.get("message", "")
+        session_id = data.get("session_id", "")
+
+        # Input validation
+        if not message or not str(message).strip():
+            return jsonify({"success": False, "error": "message must be a non-empty string"}), 400
+        if not session_id or not str(session_id).strip():
+            return jsonify({"success": False, "error": "session_id is required"}), 400
+        if len(str(message)) > 2000:
+            return jsonify({"success": False, "error": "message is too long (max 2000 characters)"}), 400
+
+        session_id = str(session_id).strip()
+        message = str(message).strip()
+
+        # Load and authorise the session
+        session_row = db.execute(
+            "SELECT id, student_id, status FROM analysis_sessions WHERE id = ?",
+            (session_id,),
+        ).fetchone()
+
+        if session_row is None:
+            return jsonify({"success": False, "error": "Session not found"}), 404
+        if session_row["student_id"] != student_id:
+            return jsonify({"success": False, "error": "Not found"}), 403
+        if session_row["status"] != "complete":
+            return jsonify({"success": False, "error": "Analysis session is not complete"}), 400
+
+        # Delegate to the tutor module
+        try:
+            result = tutor_module.get_tutor_response(session_id, message, db)
+            return jsonify({"success": True, "response": result["response"]}), 200
+        except TutorMessageLimitError as exc:
+            return jsonify({"success": False, "error": exc.message}), 429
+        except TutorTimeoutError as exc:
+            return jsonify({"success": False, "error": exc.message}), 408
+        except (TutorError, TutorContextError) as exc:
+            app.logger.error("Tutor chat error for session %s: %s", session_id, exc)
+            return jsonify({"success": False, "error": exc.message}), 500
+        except Exception:
+            app.logger.exception("Unexpected tutor chat error for session %s", session_id)
+            return jsonify({"success": False, "error": "An unexpected error occurred. Please try again."}), 500
 
     # -----------------------------------------------------------------------
     # Task 4.3 — Global error handlers

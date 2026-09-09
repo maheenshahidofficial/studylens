@@ -1,6 +1,6 @@
 /* ==========================================================================
    components.css — UI component styles
-   StudyLens AI
+   StudyLens AI — Indigo/Purple design system
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
@@ -25,8 +25,10 @@
   transition: background-color var(--transition-fast),
               border-color var(--transition-fast),
               color var(--transition-fast),
-              box-shadow var(--transition-fast);
+              box-shadow var(--transition-fast),
+              transform var(--transition-fast);
   white-space: nowrap;
+  position: relative;
 }
 
 .btn:disabled {
@@ -36,35 +38,44 @@
 }
 
 .btn-primary {
-  background-color: var(--color-primary);
-  border-color: var(--color-primary);
+  background: var(--gradient-brand);
+  border-color: transparent;
   color: var(--color-on-primary);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background-color: var(--color-primary-dark);
-  border-color: var(--color-primary-dark);
+  background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
+  box-shadow: 0 4px 16px rgba(79, 70, 229, 0.45);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(79, 70, 229, 0.3);
 }
 
 .btn-secondary {
   background-color: var(--color-surface);
   border-color: var(--color-border);
-  color: var(--color-text);
+  color: var(--color-primary);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background-color: var(--color-surface-alt);
+  background-color: var(--color-primary-light);
   border-color: var(--color-primary);
+  transform: translateY(-1px);
 }
 
 .btn-ghost {
   background-color: transparent;
   border-color: transparent;
-  color: var(--color-text);
+  color: var(--color-text-body);
 }
 
 .btn-ghost:hover:not(:disabled) {
-  background-color: var(--color-surface-alt);
+  background-color: var(--color-surface-tinted);
+  color: var(--color-primary);
 }
 
 .btn-full {
@@ -128,7 +139,56 @@ input[type="file"] {
 }
 
 /* --------------------------------------------------------------------------
-   3. Alerts and inline errors
+   3. Upload drop zone
+   -------------------------------------------------------------------------- */
+
+.upload-dropzone {
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8) var(--space-6);
+  text-align: center;
+  background: var(--gradient-brand-soft);
+  transition: border-color var(--transition-base), background var(--transition-base);
+  cursor: pointer;
+  position: relative;
+}
+
+.upload-dropzone:hover,
+.upload-dropzone:focus-within {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.upload-dropzone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  min-height: unset;
+  width: 100%;
+  height: 100%;
+}
+
+.upload-dropzone-icon {
+  font-size: 2.5rem;
+  margin-bottom: var(--space-3);
+  display: block;
+}
+
+.upload-dropzone-label {
+  font-weight: 700;
+  font-size: var(--font-size-lg);
+  color: var(--color-primary-dark);
+  margin-bottom: var(--space-1);
+}
+
+.upload-dropzone-hint {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   4. Alerts and inline errors
    -------------------------------------------------------------------------- */
 
 .alert {
@@ -170,13 +230,13 @@ input[type="file"] {
 }
 
 /* --------------------------------------------------------------------------
-   4. Auth tabs
+   5. Auth tabs
    -------------------------------------------------------------------------- */
 
 .auth-tabs {
   display: flex;
   gap: 0;
-  border-bottom: 2px solid var(--color-border);
+  border-bottom: 2px solid var(--color-border-light);
   margin-bottom: var(--space-5);
 }
 
@@ -198,7 +258,7 @@ input[type="file"] {
 
 .auth-tab:hover:not(.auth-tab--active) {
   color: var(--color-text);
-  background-color: var(--color-surface-alt);
+  background-color: var(--color-surface-tinted);
 }
 
 .auth-tab--active {
@@ -207,7 +267,7 @@ input[type="file"] {
 }
 
 /* --------------------------------------------------------------------------
-   5. Readiness score card
+   6. Readiness score card
    -------------------------------------------------------------------------- */
 
 .score-card {
@@ -216,12 +276,18 @@ input[type="file"] {
   align-items: center;
   justify-content: center;
   gap: var(--space-1);
-  width: 140px;
-  height: 140px;
+  width: 148px;
+  height: 148px;
   border-radius: 50%;
+  background: var(--gradient-brand-soft);
   border: 4px solid var(--color-primary);
   margin: 0 auto var(--space-6);
-  background-color: var(--color-primary-light);
+  box-shadow: var(--shadow-glow);
+  transition: box-shadow var(--transition-base);
+}
+
+.score-card:hover {
+  box-shadow: var(--shadow-glow), var(--shadow-md);
 }
 
 .score-value {
@@ -238,8 +304,13 @@ input[type="file"] {
   text-align: center;
 }
 
+/* Score value state classes */
+.score-value.score-badge--danger  { color: var(--color-danger-text); }
+.score-value.score-badge--caution { color: var(--color-caution-text); }
+.score-value.score-badge--good    { color: var(--color-success-text); }
+
 /* --------------------------------------------------------------------------
-   6. Coverage summary counts
+   7. Coverage summary
    -------------------------------------------------------------------------- */
 
 .coverage-count {
@@ -250,26 +321,35 @@ input[type="file"] {
 }
 
 .coverage-label {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
-  font-weight: 600;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: var(--space-1);
 }
 
+#count-covered,
+#dash-count-covered { color: var(--color-success-text); }
+#count-partial,
+#dash-count-partial  { color: var(--color-caution-text); }
+#count-missing,
+#dash-count-missing  { color: var(--color-danger-text); }
+
 /* --------------------------------------------------------------------------
-   7. Badges
+   8. Badges
    -------------------------------------------------------------------------- */
 
 .badge {
   display: inline-block;
   padding: 2px var(--space-2);
   border-radius: var(--radius-full);
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: 700;
   line-height: 1.6;
   white-space: nowrap;
 }
 
-/* Coverage status badges */
 .badge-covered {
   background-color: var(--color-covered-bg);
   color: var(--color-covered-text);
@@ -285,7 +365,6 @@ input[type="file"] {
   color: var(--color-missing-text);
 }
 
-/* Importance badges */
 .badge-importance-high {
   background-color: var(--color-importance-high-bg);
   color: var(--color-importance-high-text);
@@ -301,7 +380,6 @@ input[type="file"] {
   color: var(--color-importance-low-text);
 }
 
-/* Score badges used by history.js */
 .score-badge {
   display: inline-block;
   padding: var(--space-1) var(--space-3);
@@ -327,7 +405,7 @@ input[type="file"] {
 }
 
 /* --------------------------------------------------------------------------
-   8. Data table (topic coverage)
+   9. Data table
    -------------------------------------------------------------------------- */
 
 .data-table {
@@ -337,10 +415,10 @@ input[type="file"] {
 }
 
 .data-table th {
-  background-color: var(--color-surface-alt);
-  color: var(--color-text-muted);
+  background: var(--gradient-brand-soft);
+  color: var(--color-primary-dark);
   font-weight: 700;
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding: var(--space-3) var(--space-4);
@@ -351,9 +429,9 @@ input[type="file"] {
 
 .data-table td {
   padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border-light);
   vertical-align: top;
-  color: var(--color-text);
+  color: var(--color-text-body);
   line-height: 1.5;
 }
 
@@ -362,11 +440,11 @@ input[type="file"] {
 }
 
 .data-table tr:hover td {
-  background-color: var(--color-surface-alt);
+  background-color: var(--color-surface-tinted);
 }
 
 /* --------------------------------------------------------------------------
-   9. Warnings list
+   10. Warnings list
    -------------------------------------------------------------------------- */
 
 .warnings-list {
@@ -393,15 +471,38 @@ input[type="file"] {
 }
 
 /* --------------------------------------------------------------------------
-   10. Knowledge gap cards
+   11. Knowledge gap cards
    -------------------------------------------------------------------------- */
 
 .gap-item {
   background-color: var(--color-surface);
-  border: 1.5px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border: 1.5px solid var(--color-border-light);
+  border-left: 4px solid var(--color-primary);
+  border-radius: var(--radius-lg);
   padding: var(--space-4);
-  box-shadow: 0 1px 3px var(--color-shadow);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.gap-item:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateX(2px);
+}
+
+/* Priority-based left border colors */
+.gap-item[data-priority="1"],
+.gap-item[data-priority="2"] {
+  border-left-color: var(--color-danger-solid);
+}
+
+.gap-item[data-priority="3"],
+.gap-item[data-priority="4"] {
+  border-left-color: var(--color-caution-solid);
+}
+
+.gap-item[data-priority="5"],
+.gap-item[data-priority="6"] {
+  border-left-color: var(--color-accent);
 }
 
 .gap-header {
@@ -428,28 +529,41 @@ input[type="file"] {
 }
 
 /* --------------------------------------------------------------------------
-   11. Revision plan tasks
+   12. Revision plan tasks
    -------------------------------------------------------------------------- */
 
 .revision-total {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
   font-weight: 700;
-  font-size: var(--font-size-base);
-  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  color: var(--color-primary-dark);
+  background-color: var(--color-primary-light);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
   margin-bottom: var(--space-4);
+  border: 1px solid var(--color-primary-mid);
 }
 
 .revision-task {
   background-color: var(--color-surface);
-  border: 1.5px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-4);
-  box-shadow: 0 1px 3px var(--color-shadow);
+  border: 1.5px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-5);
+  box-shadow: var(--shadow-sm);
   list-style: none;
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.revision-task:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }
 
 .revision-task--maintenance {
   border-color: var(--color-success-border);
-  background-color: var(--color-success-bg);
+  background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
 }
 
 .revision-task-header {
@@ -468,13 +582,14 @@ input[type="file"] {
 }
 
 .revision-task-duration {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   font-weight: 700;
-  color: var(--color-text-muted);
-  background-color: var(--color-surface-alt);
-  padding: 2px var(--space-3);
+  color: var(--color-primary-dark);
+  background-color: var(--color-primary-light);
+  padding: 3px var(--space-3);
   border-radius: var(--radius-full);
   white-space: nowrap;
+  border: 1px solid var(--color-primary-mid);
 }
 
 .revision-task-description {
@@ -485,7 +600,7 @@ input[type="file"] {
 }
 
 /* --------------------------------------------------------------------------
-   12. Progress panel / spinner
+   13. Progress panel / spinner
    -------------------------------------------------------------------------- */
 
 .progress-status {
@@ -497,12 +612,13 @@ input[type="file"] {
 
 .spinner {
   display: inline-block;
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   border: 4px solid var(--color-border);
   border-top-color: var(--color-primary);
+  border-right-color: var(--color-accent);
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  animation: spin 0.85s linear infinite;
   margin: 0 auto var(--space-4);
 }
 
@@ -511,28 +627,28 @@ input[type="file"] {
 }
 
 /* --------------------------------------------------------------------------
-   13. Session history cards
+   14. Session history cards
    -------------------------------------------------------------------------- */
 
 .session-card {
   background-color: var(--color-surface);
-  border: 1.5px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-4);
+  border: 1.5px solid var(--color-border-light);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
   cursor: pointer;
   transition: border-color var(--transition-fast),
               box-shadow var(--transition-fast),
               transform var(--transition-fast);
-  box-shadow: 0 1px 3px var(--color-shadow);
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-3);
 }
 
 .session-card:hover {
   border-color: var(--color-primary);
-  box-shadow: 0 4px 12px var(--color-shadow);
-  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
 .session-card:focus-visible {
@@ -567,17 +683,17 @@ input[type="file"] {
 }
 
 .session-summary-item {
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   padding: 2px var(--space-2);
   border-radius: var(--radius-full);
-  background-color: var(--color-surface-alt);
+  background-color: var(--color-surface-tinted);
   color: var(--color-text-muted);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-light);
 }
 
 .session-card-status {
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: 700;
   text-transform: capitalize;
 }
@@ -586,46 +702,56 @@ input[type="file"] {
 .session-status--failed   { color: var(--color-danger-text); }
 
 /* --------------------------------------------------------------------------
-   14. Empty state
+   15. Empty state
    -------------------------------------------------------------------------- */
 
 .empty-state {
   text-align: center;
   color: var(--color-text-muted);
-  padding: var(--space-8) var(--space-4);
+  padding: var(--space-12) var(--space-4);
   font-style: italic;
 }
 
-/* --------------------------------------------------------------------------
-   15. Navigation brand title — hide on very narrow viewports
-   -------------------------------------------------------------------------- */
-
-@media (max-width: 375px) {
-  .nav-title {
-    display: none;
-  }
-
-  .panel {
-    padding: var(--space-4);
-    border-radius: var(--radius-md);
-  }
-
-  .score-card {
-    width: 110px;
-    height: 110px;
-  }
-
-  .score-value {
-    font-size: var(--font-size-2xl);
-  }
+.empty-state-icon {
+  font-size: 3rem;
+  margin-bottom: var(--space-4);
+  display: block;
+  opacity: 0.5;
 }
 
-/* ==========================================================================
-   Tasks 23.1 & 23.2 — Tutor panel and Dashboard component styles
-   ========================================================================== */
+/* --------------------------------------------------------------------------
+   16. Section headers
+   -------------------------------------------------------------------------- */
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 2px solid var(--color-border-light);
+}
+
+.section-header h2 {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  color: var(--color-text);
+}
+
+.section-header-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--gradient-brand);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
 
 /* --------------------------------------------------------------------------
-   Dashboard layout
+   17. Dashboard layout
    -------------------------------------------------------------------------- */
 
 .dashboard-header {
@@ -643,14 +769,14 @@ input[type="file"] {
   align-items: flex-start;
   gap: var(--space-6);
   margin-bottom: var(--space-6);
-  padding: var(--space-5);
-  background-color: var(--color-surface-alt);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  background: var(--gradient-brand-soft);
+  border: 1px solid var(--color-primary-mid);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
 }
 
 .dash-hero .score-card {
-  /* Override the centred/full-width default for inline use */
   margin: 0;
   flex-shrink: 0;
 }
@@ -664,11 +790,11 @@ input[type="file"] {
 }
 
 .dash-course-label {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-  font-weight: 600;
+  font-size: var(--font-size-xs);
+  color: var(--color-primary-dark);
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
 }
 
 .dash-course-name {
@@ -684,7 +810,6 @@ input[type="file"] {
   margin-top: var(--space-2);
 }
 
-/* Knowledge gap item inside dashboard */
 .dash-gap-item {
   display: flex;
   align-items: center;
@@ -692,9 +817,15 @@ input[type="file"] {
   gap: var(--space-2);
   padding: var(--space-3) var(--space-4);
   background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-light);
+  border-left: 3px solid var(--color-primary);
   border-radius: var(--radius-md);
   margin-bottom: var(--space-2);
+  transition: box-shadow var(--transition-fast);
+}
+
+.dash-gap-item:hover {
+  box-shadow: var(--shadow-sm);
 }
 
 .dash-recent-card {
@@ -705,18 +836,18 @@ input[type="file"] {
 
 .dash-recent-card:hover {
   border-color: var(--color-primary);
-  box-shadow: 0 4px 12px var(--color-shadow);
-  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
 /* --------------------------------------------------------------------------
-   Tutor panel layout
+   18. Tutor panel
    -------------------------------------------------------------------------- */
 
 .tutor-panel {
   display: flex;
   flex-direction: column;
-  max-height: calc(100vh - 120px);
+  max-height: calc(100vh - 100px);
   padding: var(--space-5);
 }
 
@@ -726,6 +857,8 @@ input[type="file"] {
   gap: var(--space-4);
   margin-bottom: var(--space-3);
   flex-wrap: wrap;
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border-light);
 }
 
 .tutor-header-left {
@@ -735,12 +868,18 @@ input[type="file"] {
   flex: 1;
 }
 
+.tutor-header-left h1 {
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 .btn-icon {
   padding: var(--space-1) var(--space-3);
   font-size: var(--font-size-sm);
 }
 
-/* Quick prompt buttons */
 .tutor-quick-prompts {
   display: flex;
   flex-wrap: wrap;
@@ -749,47 +888,58 @@ input[type="file"] {
 }
 
 .btn-quick-prompt {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   padding: var(--space-1) var(--space-3);
-  background-color: var(--color-primary-light);
+  background-color: var(--color-surface-tinted);
   color: var(--color-primary-dark);
-  border: 1.5px solid var(--color-primary);
+  border: 1.5px solid var(--color-primary-mid);
   border-radius: var(--radius-full);
   font-size: var(--font-size-sm);
   font-weight: 600;
   cursor: pointer;
-  transition: background-color var(--transition-fast), color var(--transition-fast);
+  transition: background-color var(--transition-fast),
+              color var(--transition-fast),
+              border-color var(--transition-fast),
+              transform var(--transition-fast);
   white-space: nowrap;
   min-height: var(--touch-target);
 }
 
 .btn-quick-prompt:hover {
-  background-color: var(--color-primary);
+  background: var(--gradient-brand);
   color: var(--color-on-primary);
+  border-color: transparent;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
 }
 
-/* Message thread */
 .tutor-messages {
   flex: 1;
   overflow-y: auto;
-  min-height: 240px;
-  max-height: 400px;
-  padding: var(--space-3);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background-color: var(--color-surface-alt);
+  min-height: 260px;
+  max-height: 420px;
+  padding: var(--space-4);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface-tinted);
   margin-bottom: var(--space-4);
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
 }
 
-/* Individual message wrapper */
 .tutor-message {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
   max-width: 82%;
+  animation: messageSlideIn 0.2s ease;
+}
+
+@keyframes messageSlideIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .tutor-message--user {
@@ -803,36 +953,37 @@ input[type="file"] {
 }
 
 .tutor-message-label {
-  font-size: 0.72rem;
+  font-size: var(--font-size-xs);
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   color: var(--color-text-muted);
   padding: 0 var(--space-1);
 }
 
 .tutor-message-bubble {
   padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   font-size: var(--font-size-base);
   line-height: 1.65;
   word-break: break-word;
 }
 
 .tutor-message--user .tutor-message-bubble {
-  background-color: var(--color-primary);
+  background: var(--gradient-brand);
   color: var(--color-on-primary);
   border-bottom-right-radius: var(--radius-sm);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
 }
 
 .tutor-message--assistant .tutor-message-bubble {
   background-color: var(--color-surface);
-  color: var(--color-text);
-  border: 1px solid var(--color-border);
+  color: var(--color-text-body);
+  border: 1.5px solid var(--color-border-light);
   border-bottom-left-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
 }
 
-/* Loading indicator */
 .tutor-loading {
   display: flex;
   align-items: center;
@@ -841,9 +992,9 @@ input[type="file"] {
   color: var(--color-text-muted);
   margin-bottom: var(--space-2);
   min-height: 28px;
+  padding-left: var(--space-2);
 }
 
-/* Input row */
 .tutor-input-row {
   display: flex;
   gap: var(--space-3);
@@ -852,16 +1003,16 @@ input[type="file"] {
 
 .tutor-input {
   flex: 1;
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-3) var(--space-4);
   font-family: var(--font-family);
   font-size: var(--font-size-base);
   color: var(--color-text);
   background-color: var(--color-surface);
   border: 1.5px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   resize: none;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-  min-height: calc(var(--touch-target) + 8px);
+  min-height: calc(var(--touch-target) + 12px);
   line-height: 1.5;
 }
 
@@ -877,10 +1028,28 @@ input[type="file"] {
 }
 
 /* --------------------------------------------------------------------------
-   Mobile responsive overrides for tutor and dashboard
+   19. Nav title small viewports
    -------------------------------------------------------------------------- */
 
 @media (max-width: 375px) {
+  .nav-title {
+    display: none;
+  }
+
+  .panel {
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+  }
+
+  .score-card {
+    width: 120px;
+    height: 120px;
+  }
+
+  .score-value {
+    font-size: var(--font-size-2xl);
+  }
+
   .dash-hero {
     flex-direction: column;
     align-items: center;
@@ -888,8 +1057,8 @@ input[type="file"] {
   }
 
   .dash-hero .score-card {
-    width: 110px;
-    height: 110px;
+    width: 120px;
+    height: 120px;
   }
 
   .dash-actions {
@@ -897,8 +1066,8 @@ input[type="file"] {
   }
 
   .tutor-messages {
-    max-height: 280px;
-    min-height: 180px;
+    max-height: 300px;
+    min-height: 200px;
   }
 
   .tutor-message {
@@ -912,5 +1081,13 @@ input[type="file"] {
   .btn-quick-prompt {
     font-size: 0.78rem;
     padding: var(--space-1) var(--space-2);
+  }
+
+  .landing-hero {
+    padding: var(--space-6) var(--space-4) var(--space-8);
+  }
+
+  .hero-headline {
+    font-size: var(--font-size-2xl);
   }
 }

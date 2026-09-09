@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="StudyLens AI — Upload your study material and syllabus to get an AI-powered exam readiness report, knowledge gap analysis, and personalised revision plan." />
   <title>StudyLens AI — Exam Readiness Auditor</title>
-
-  <!-- CSS -->
   <link rel="stylesheet" href="/static/css/base.css" />
   <link rel="stylesheet" href="/static/css/layout.css" />
   <link rel="stylesheet" href="/static/css/components.css" />
@@ -18,250 +17,183 @@
   <header id="nav" role="banner">
     <div class="nav-inner">
       <a href="/" class="nav-brand" aria-label="StudyLens AI home">
-        <span class="nav-logo" aria-hidden="true">🔍</span>
+        <span class="nav-logo" aria-hidden="true">🔬</span>
         <span class="nav-title">StudyLens AI</span>
       </a>
 
       <nav class="nav-actions" aria-label="Site navigation">
-        <!-- Shown when NOT authenticated -->
         <div id="nav-auth-links" class="nav-group">
-          <button id="nav-show-login" type="button" class="btn btn-ghost">
-            Log in
-          </button>
-          <button id="nav-show-register" type="button" class="btn btn-primary">
-            Register
-          </button>
+          <button id="nav-show-login" type="button" class="btn btn-ghost">Log in</button>
+          <button id="nav-show-register" type="button" class="btn btn-primary">Get started</button>
         </div>
 
-        <!-- Shown when authenticated -->
         <div id="nav-user-links" class="nav-group" hidden>
-          <button id="nav-show-dashboard" type="button" class="btn btn-ghost">
-            Dashboard
-          </button>
-          <button id="nav-show-history" type="button" class="btn btn-ghost">
-            Sessions
-          </button>
-          <button id="nav-logout" type="button" class="btn btn-ghost">
-            Log out
-          </button>
+          <button id="nav-show-dashboard" type="button" class="btn btn-ghost">Dashboard</button>
+          <button id="nav-show-history" type="button" class="btn btn-ghost">Sessions</button>
+          <button id="nav-logout" type="button" class="btn btn-ghost">Log out</button>
         </div>
       </nav>
     </div>
   </header>
 
-  <!-- Global live-region for status/error announcements -->
   <div id="global-status" role="status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
   <main id="main-content">
 
     <!-- ==================================================================
-         Auth panel — register and login forms
-         Visible when the user is NOT authenticated.
+         Auth / Landing panel
          ================================================================== -->
     <section id="auth-panel" class="panel" aria-labelledby="auth-heading">
-      <h1 id="auth-heading" class="panel-title">Welcome to StudyLens AI</h1>
-      <p class="panel-subtitle">
-        Audit your study material against your course syllabus and get a
-        personalised exam-readiness report.
-      </p>
 
-      <!-- Auth error live region -->
+      <!-- Hero banner — visible on landing -->
+      <div class="landing-hero" aria-hidden="false">
+        <span class="hero-icon" aria-hidden="true">🔬</span>
+        <h1 class="hero-headline">Turn your study material<br>into a learning plan</h1>
+        <p class="hero-sub">AI-powered exam readiness analysis in under 60 seconds</p>
+      </div>
+
+      <!-- Feature pills -->
+      <div class="hero-features" aria-label="Key features">
+        <span class="hero-feature-pill">✦ Knowledge gap detection</span>
+        <span class="hero-feature-pill">✦ Readiness score</span>
+        <span class="hero-feature-pill">✦ Revision plan</span>
+        <span class="hero-feature-pill">✦ AI Study Tutor</span>
+      </div>
+
+      <h2 id="auth-heading" class="panel-title" style="text-align:center;font-size:1.25rem;">Welcome back</h2>
+
       <div id="auth-error" role="status" aria-live="assertive" class="alert alert-error" hidden></div>
 
       <!-- Tab controls -->
       <div class="auth-tabs" role="tablist" aria-label="Authentication options">
-        <button
-          id="tab-login"
-          role="tab"
-          aria-selected="true"
-          aria-controls="form-login"
-          type="button"
-          class="auth-tab auth-tab--active"
-        >
-          Log in
-        </button>
-        <button
-          id="tab-register"
-          role="tab"
-          aria-selected="false"
-          aria-controls="form-register"
-          type="button"
-          class="auth-tab"
-        >
-          Register
-        </button>
+        <button id="tab-login" role="tab" aria-selected="true" aria-controls="form-login"
+          type="button" class="auth-tab auth-tab--active">Log in</button>
+        <button id="tab-register" role="tab" aria-selected="false" aria-controls="form-register"
+          type="button" class="auth-tab">Create account</button>
       </div>
 
       <!-- Login form -->
-      <form
-        id="form-login"
-        role="tabpanel"
-        aria-labelledby="tab-login"
-        class="auth-form"
-        novalidate
-      >
+      <form id="form-login" role="tabpanel" aria-labelledby="tab-login" class="auth-form" novalidate>
         <div class="field">
           <label for="login-email">Email address</label>
-          <input
-            id="login-email"
-            name="email"
-            type="email"
-            autocomplete="email"
-            required
-            placeholder="you@university.edu"
-          />
+          <input id="login-email" name="email" type="email" autocomplete="email"
+            required placeholder="you@university.edu" />
         </div>
-
         <div class="field">
           <label for="login-password">Password</label>
-          <input
-            id="login-password"
-            name="password"
-            type="password"
-            autocomplete="current-password"
-            required
-          />
+          <input id="login-password" name="password" type="password"
+            autocomplete="current-password" required />
         </div>
-
         <div id="login-error" role="status" aria-live="assertive" class="field-error" hidden></div>
-
-        <button id="btn-login" type="submit" class="btn btn-primary btn-full">
-          Log in
-        </button>
+        <button id="btn-login" type="submit" class="btn btn-primary btn-full">Log in</button>
       </form>
 
       <!-- Register form -->
-      <form
-        id="form-register"
-        role="tabpanel"
-        aria-labelledby="tab-register"
-        class="auth-form"
-        hidden
-        novalidate
-      >
+      <form id="form-register" role="tabpanel" aria-labelledby="tab-register"
+        class="auth-form" hidden novalidate>
         <div class="field">
           <label for="register-email">Email address</label>
-          <input
-            id="register-email"
-            name="email"
-            type="email"
-            autocomplete="email"
-            required
-            placeholder="you@university.edu"
-          />
+          <input id="register-email" name="email" type="email" autocomplete="email"
+            required placeholder="you@university.edu" />
         </div>
-
         <div class="field">
           <label for="register-password">Password</label>
-          <input
-            id="register-password"
-            name="password"
-            type="password"
-            autocomplete="new-password"
-            required
-            aria-describedby="register-password-hint"
-          />
-          <span id="register-password-hint" class="field-hint">
-            8–128 characters
-          </span>
+          <input id="register-password" name="password" type="password"
+            autocomplete="new-password" required aria-describedby="register-password-hint" />
+          <span id="register-password-hint" class="field-hint">8–128 characters</span>
         </div>
-
         <div id="register-error" role="status" aria-live="assertive" class="field-error" hidden></div>
-
-        <button id="btn-register" type="submit" class="btn btn-primary btn-full">
-          Create account
-        </button>
+        <button id="btn-register" type="submit" class="btn btn-primary btn-full">Create free account</button>
       </form>
     </section>
 
     <!-- ==================================================================
-         Upload panel — PDF upload form
-         Visible when the user IS authenticated.
+         Upload panel
          ================================================================== -->
     <section id="upload-panel" class="panel" aria-labelledby="upload-heading" hidden>
-      <h1 id="upload-heading" class="panel-title">Analyse Your Study Material</h1>
-      <p class="panel-subtitle">
-        Upload your course syllabus and lecture notes to receive an
-        exam-readiness report.
-      </p>
+      <div class="report-header" style="margin-bottom:var(--space-2)">
+        <div>
+          <h1 id="upload-heading" class="panel-title" style="margin-bottom:var(--space-1)">Analyse Your Study Material</h1>
+          <p class="panel-subtitle" style="margin-bottom:0">Upload your PDF documents to receive your AI-powered exam readiness report.</p>
+        </div>
+      </div>
+
+      <!-- What happens next info strip -->
+      <div style="display:flex;flex-wrap:wrap;gap:var(--space-3);margin-bottom:var(--space-6);padding:var(--space-4);background:var(--gradient-brand-soft);border:1px solid var(--color-primary-mid);border-radius:var(--radius-lg)">
+        <span style="font-size:var(--font-size-sm);color:var(--color-primary-dark);font-weight:600;display:flex;align-items:center;gap:6px">📄 Extract text from PDFs</span>
+        <span style="font-size:var(--font-size-sm);color:var(--color-text-muted)">→</span>
+        <span style="font-size:var(--font-size-sm);color:var(--color-primary-dark);font-weight:600;display:flex;align-items:center;gap:6px">🧠 AI topic analysis</span>
+        <span style="font-size:var(--font-size-sm);color:var(--color-text-muted)">→</span>
+        <span style="font-size:var(--font-size-sm);color:var(--color-primary-dark);font-weight:600;display:flex;align-items:center;gap:6px">📊 Readiness report</span>
+        <span style="font-size:var(--font-size-sm);color:var(--color-text-muted)">→</span>
+        <span style="font-size:var(--font-size-sm);color:var(--color-primary-dark);font-weight:600;display:flex;align-items:center;gap:6px">📚 Revision plan</span>
+      </div>
 
       <form id="form-upload" class="upload-form" novalidate enctype="multipart/form-data">
 
         <div class="field">
           <label for="input-study-material">
-            Study material
-            <span class="field-required" aria-hidden="true">*</span>
+            Study material <span class="field-required" aria-hidden="true">*</span>
           </label>
-          <input
-            id="input-study-material"
-            name="study_material"
-            type="file"
-            accept=".pdf,application/pdf"
-            required
-            aria-describedby="study-material-hint study-material-error"
-          />
-          <span id="study-material-hint" class="field-hint">PDF only, max 20 MB</span>
+          <div class="upload-dropzone" id="dropzone-study">
+            <span class="upload-dropzone-icon" aria-hidden="true">📄</span>
+            <div class="upload-dropzone-label">Drop your study notes here or click to browse</div>
+            <div class="upload-dropzone-hint">PDF only · max 20 MB</div>
+            <input id="input-study-material" name="study_material" type="file"
+              accept=".pdf,application/pdf" required
+              aria-describedby="study-material-hint study-material-error" />
+          </div>
+          <span id="study-material-hint" class="field-hint sr-only">PDF only, max 20 MB</span>
           <span id="study-material-error" role="status" aria-live="assertive" class="field-error" hidden></span>
         </div>
 
         <div class="field">
           <label for="input-syllabus">
-            Course syllabus
-            <span class="field-required" aria-hidden="true">*</span>
+            Course syllabus <span class="field-required" aria-hidden="true">*</span>
           </label>
-          <input
-            id="input-syllabus"
-            name="syllabus"
-            type="file"
-            accept=".pdf,application/pdf"
-            required
-            aria-describedby="syllabus-hint syllabus-error"
-          />
-          <span id="syllabus-hint" class="field-hint">PDF only, max 20 MB</span>
+          <div class="upload-dropzone" id="dropzone-syllabus">
+            <span class="upload-dropzone-icon" aria-hidden="true">📋</span>
+            <div class="upload-dropzone-label">Drop your syllabus here or click to browse</div>
+            <div class="upload-dropzone-hint">PDF only · max 20 MB</div>
+            <input id="input-syllabus" name="syllabus" type="file"
+              accept=".pdf,application/pdf" required
+              aria-describedby="syllabus-hint syllabus-error" />
+          </div>
+          <span id="syllabus-hint" class="field-hint sr-only">PDF only, max 20 MB</span>
           <span id="syllabus-error" role="status" aria-live="assertive" class="field-error" hidden></span>
         </div>
 
         <div class="field">
           <label for="input-course-name">Course name <span class="field-optional">(optional)</span></label>
-          <input
-            id="input-course-name"
-            name="course_name"
-            type="text"
-            autocomplete="off"
-            placeholder="e.g. Introduction to Machine Learning"
-          />
+          <input id="input-course-name" name="course_name" type="text"
+            autocomplete="off" placeholder="e.g. Introduction to Machine Learning" />
         </div>
 
         <div id="upload-error" role="status" aria-live="assertive" class="alert alert-error" hidden></div>
 
         <button id="btn-analyze" type="submit" class="btn btn-primary btn-full" disabled>
-          Analyse my study material
+          🔍 Analyse my study material
         </button>
       </form>
     </section>
 
     <!-- ==================================================================
-         Progress panel — shown while analysis is running
+         Progress panel
          ================================================================== -->
     <section id="progress-panel" class="panel panel-centered" aria-labelledby="progress-heading" hidden>
       <div class="spinner" aria-hidden="true"></div>
       <h2 id="progress-heading" class="panel-title">Analysing your documents…</h2>
-      <p class="panel-subtitle">
-        This may take up to 60 seconds. Please don't close this page.
-      </p>
+      <p class="panel-subtitle">This may take up to 60 seconds. Please don't close this page.</p>
       <div id="progress-status" role="status" aria-live="polite" class="progress-status"></div>
     </section>
 
     <!-- ==================================================================
-         Report panel — displays readiness report and revision plan
-         Initially hidden; shown after a successful analysis.
+         Report panel
          ================================================================== -->
     <section id="report-panel" class="panel" aria-labelledby="report-heading" hidden>
       <div class="report-header">
-        <h1 id="report-heading" class="panel-title">Your Exam Readiness Report</h1>
-        <button id="btn-new-analysis" type="button" class="btn btn-secondary">
-          New analysis
-        </button>
+        <h1 id="report-heading" class="panel-title" style="margin-bottom:0">Your Exam Readiness Report</h1>
+        <button id="btn-new-analysis" type="button" class="btn btn-secondary">New analysis</button>
       </div>
 
       <!-- Readiness score -->
@@ -270,10 +202,8 @@
         <div class="score-label">Readiness Score</div>
       </div>
 
-      <!-- Score alert banners (hidden until rendered by report.js) -->
       <div id="score-alert-danger" role="alert" class="alert alert-danger" hidden>
-        Your score is below 50%. Review missing and partially covered topics
-        before your exam.
+        Your score is below 50%. Review missing and partially covered topics before your exam.
       </div>
       <div id="score-alert-caution" role="alert" class="alert alert-caution" hidden>
         Your preparation is partial. Review the partially covered topics below.
@@ -295,12 +225,14 @@
         </div>
       </div>
 
-      <!-- Warnings from extraction / pipeline -->
       <div id="report-warnings" role="status" aria-live="polite" class="warnings-list" hidden></div>
 
       <!-- Per-topic coverage table -->
       <section aria-labelledby="topics-heading">
-        <h2 id="topics-heading">Topic Coverage</h2>
+        <div class="section-header">
+          <div class="section-header-icon" aria-hidden="true">📊</div>
+          <h2 id="topics-heading" style="margin-bottom:0">Topic Coverage</h2>
+        </div>
         <div class="table-wrapper" role="region" aria-label="Topic coverage table" tabindex="0">
           <table id="topics-table" class="data-table">
             <thead>
@@ -311,90 +243,106 @@
                 <th scope="col">Reasoning</th>
               </tr>
             </thead>
-            <tbody id="topics-tbody">
-              <!-- Rows injected by report.js -->
-            </tbody>
+            <tbody id="topics-tbody"></tbody>
           </table>
         </div>
       </section>
 
       <!-- Knowledge gaps -->
       <section aria-labelledby="gaps-heading">
-        <h2 id="gaps-heading">Knowledge Gaps</h2>
+        <div class="section-header">
+          <div class="section-header-icon" aria-hidden="true">🎯</div>
+          <h2 id="gaps-heading" style="margin-bottom:0">Knowledge Gaps</h2>
+        </div>
         <div id="gaps-list" class="gaps-list" role="list">
-          <!-- Items injected by report.js -->
           <p id="gaps-empty" class="empty-state" hidden>
             No knowledge gaps detected — your study material covers the full syllabus.
           </p>
         </div>
       </section>
 
-      <!-- Revision plan (rendered by revisionPlan.js) -->
+      <!-- Revision plan -->
       <section aria-labelledby="revision-heading">
-        <h2 id="revision-heading">Revision Plan</h2>
+        <div class="section-header">
+          <div class="section-header-icon" aria-hidden="true">🗓</div>
+          <h2 id="revision-heading" style="margin-bottom:0">Revision Plan</h2>
+        </div>
         <div id="revision-plan-container">
           <div id="revision-total-time" class="revision-total" aria-live="polite"></div>
-          <ol id="revision-tasks-list" class="revision-tasks" aria-label="Revision tasks">
-            <!-- Tasks injected by revisionPlan.js -->
-          </ol>
+          <ol id="revision-tasks-list" class="revision-tasks" aria-label="Revision tasks"></ol>
         </div>
       </section>
+
+      <!-- Open Tutor CTA -->
+      <div style="margin-top:var(--space-6);padding:var(--space-6);background:var(--gradient-brand-soft);border:1px solid var(--color-primary-mid);border-radius:var(--radius-xl);text-align:center">
+        <p style="font-size:var(--font-size-lg);font-weight:700;color:var(--color-text);margin-bottom:var(--space-2)">
+          Ready to go deeper? 📚
+        </p>
+        <p style="color:var(--color-text-muted);margin-bottom:var(--space-4)">
+          Chat with the AI Study Tutor about your material, gaps, and revision plan.
+        </p>
+        <button id="btn-report-open-tutor" type="button" class="btn btn-primary">
+          Open AI Study Tutor
+        </button>
+      </div>
     </section>
 
     <!-- ==================================================================
-         History panel — past analysis sessions
+         History panel
          ================================================================== -->
     <section id="history-panel" class="panel" aria-labelledby="history-heading" hidden>
       <div class="history-header">
-        <h1 id="history-heading" class="panel-title">My Analysis Sessions</h1>
-        <button id="btn-new-from-history" type="button" class="btn btn-primary">
-          New analysis
-        </button>
+        <div>
+          <h1 id="history-heading" class="panel-title" style="margin-bottom:var(--space-1)">Analysis Sessions</h1>
+          <p class="panel-subtitle" style="margin-bottom:0">Your previous exam readiness reports</p>
+        </div>
+        <button id="btn-new-from-history" type="button" class="btn btn-primary">New analysis</button>
       </div>
 
       <div id="history-error" role="status" aria-live="assertive" class="alert alert-error" hidden></div>
 
-      <div id="history-list" class="session-list" role="list">
-        <!-- Session cards injected by history.js -->
-      </div>
+      <div id="history-list" class="session-list" role="list"></div>
 
-      <p id="history-empty" class="empty-state" hidden>
-        You haven't run any analyses yet. Upload your study material to get started.
-      </p>
+      <div id="history-empty" class="empty-state" hidden>
+        <span class="empty-state-icon" aria-hidden="true">📂</span>
+        <p>You haven't run any analyses yet.</p>
+        <button type="button" class="btn btn-primary" id="btn-history-start">
+          Upload your first study material
+        </button>
+      </div>
     </section>
 
     <!-- ==================================================================
-         Dashboard panel — Student progress overview
+         Dashboard panel
          ================================================================== -->
     <section id="dashboard-panel" class="panel" aria-labelledby="dashboard-heading" hidden>
       <div class="dashboard-header">
-        <h1 id="dashboard-heading" class="panel-title">Your Study Dashboard</h1>
-        <button id="btn-dash-new-analysis" type="button" class="btn btn-primary">
-          New Analysis
-        </button>
+        <div>
+          <h1 id="dashboard-heading" class="panel-title" style="margin-bottom:var(--space-1)">Study Dashboard</h1>
+          <p class="panel-subtitle" style="margin-bottom:0">Your latest exam readiness overview</p>
+        </div>
+        <button id="btn-dash-new-analysis" type="button" class="btn btn-primary">New Analysis</button>
       </div>
 
       <div id="dashboard-error" role="status" aria-live="assertive" class="alert alert-error" hidden></div>
 
-      <!-- Empty state — no completed analyses yet -->
       <div id="dash-empty" class="empty-state" hidden>
+        <span class="empty-state-icon" aria-hidden="true">🎓</span>
         <p>You haven't completed an analysis yet.</p>
         <button type="button" class="btn btn-primary" onclick="document.getElementById('dashboard-panel').hidden=true;document.getElementById('upload-panel').hidden=false;">
           Upload Your Study Material
         </button>
       </div>
 
-      <!-- Dashboard content — shown when at least one complete session exists -->
       <div id="dash-content" hidden>
 
-        <!-- Course and score -->
         <div class="dash-hero">
           <div class="score-card" aria-label="Readiness score">
             <div id="dash-score-value" class="score-value" aria-live="polite">—</div>
             <div class="score-label">Exam Readiness</div>
           </div>
           <div class="dash-hero-info">
-            <div class="dash-course-label">Current course:</div>
+            <div class="dash-course-label">Current course</div>
             <div id="dash-course-name" class="dash-course-name">—</div>
             <div class="dash-actions">
               <button id="btn-dash-view-report" type="button" class="btn btn-secondary">
@@ -407,7 +355,6 @@
           </div>
         </div>
 
-        <!-- Score alerts -->
         <div id="dash-alert-danger" role="alert" class="alert alert-danger" hidden>
           Your readiness score is below 50%. Focus on missing topics before your exam.
         </div>
@@ -433,80 +380,74 @@
 
         <!-- Top knowledge gaps -->
         <section aria-labelledby="dash-gaps-heading">
-          <h2 id="dash-gaps-heading">Top Knowledge Gaps</h2>
+          <div class="section-header">
+            <div class="section-header-icon" aria-hidden="true">🎯</div>
+            <h2 id="dash-gaps-heading" style="margin-bottom:0">Top Knowledge Gaps</h2>
+          </div>
           <div id="dash-gap-list" class="gaps-list" role="list"></div>
         </section>
 
         <!-- Revision plan summary -->
         <section id="dash-revision-section" aria-labelledby="dash-revision-heading" hidden>
-          <h2 id="dash-revision-heading">Revision Plan</h2>
+          <div class="section-header">
+            <div class="section-header-icon" aria-hidden="true">🗓</div>
+            <h2 id="dash-revision-heading" style="margin-bottom:0">Revision Plan</h2>
+          </div>
           <p id="dash-revision-summary" class="revision-total"></p>
         </section>
 
         <!-- Recent sessions -->
         <section aria-labelledby="dash-recent-heading">
-          <h2 id="dash-recent-heading">Recent Sessions</h2>
+          <div class="section-header">
+            <div class="section-header-icon" aria-hidden="true">🕐</div>
+            <h2 id="dash-recent-heading" style="margin-bottom:0">Recent Sessions</h2>
+          </div>
           <div id="dash-recent-sessions" class="session-list" role="list"></div>
         </section>
 
-      </div><!-- /#dash-content -->
+      </div>
     </section>
 
     <!-- ==================================================================
-         Tutor panel — AI Study Tutor chat interface
+         Tutor panel
          ================================================================== -->
     <section id="tutor-panel" class="panel tutor-panel" aria-labelledby="tutor-heading" hidden>
       <div class="tutor-header">
         <div class="tutor-header-left">
-          <button id="btn-tutor-back" type="button" class="btn btn-ghost btn-icon" aria-label="Back">
+          <button id="btn-tutor-back" type="button" class="btn btn-ghost btn-icon" aria-label="Go back">
             ← Back
           </button>
-          <h1 id="tutor-heading" class="panel-title">AI Study Tutor</h1>
+          <h1 id="tutor-heading" class="panel-title" style="margin-bottom:0">AI Study Tutor</h1>
         </div>
+        <span style="font-size:var(--font-size-sm);color:var(--color-text-muted);background:var(--color-surface-tinted);padding:var(--space-1) var(--space-3);border-radius:var(--radius-full);border:1px solid var(--color-border-light)">
+          Powered by Groq
+        </span>
       </div>
 
       <p class="panel-subtitle">
-        Ask questions about your uploaded study material. The tutor answers
-        based only on what you uploaded — it will tell you when a topic
-        is outside your material.
+        Ask questions about your uploaded study material. Answers are grounded in what you uploaded.
       </p>
 
       <div id="tutor-error" role="status" aria-live="assertive" class="alert alert-error" hidden></div>
 
-      <!-- Quick action prompts -->
-      <div id="tutor-quick-prompts" class="tutor-quick-prompts" aria-label="Quick actions">
-        <!-- Populated by tutor.js -->
+      <div id="tutor-quick-prompts" class="tutor-quick-prompts" aria-label="Quick actions"></div>
+
+      <div id="tutor-messages" class="tutor-messages" role="log"
+        aria-live="polite" aria-label="Conversation with AI Study Tutor">
       </div>
 
-      <!-- Message thread -->
-      <div
-        id="tutor-messages"
-        class="tutor-messages"
-        role="log"
-        aria-live="polite"
-        aria-label="Conversation with AI Study Tutor"
-      >
-        <!-- Messages injected by tutor.js -->
-      </div>
-
-      <!-- Loading indicator -->
       <div id="tutor-loading" class="tutor-loading" hidden aria-live="polite">
         <span class="spinner" aria-hidden="true" style="width:20px;height:20px;border-width:3px;"></span>
         <span>Thinking…</span>
       </div>
 
-      <!-- Input area -->
       <div class="tutor-input-row">
         <label for="tutor-input" class="sr-only">Your message</label>
-        <textarea
-          id="tutor-input"
-          class="tutor-input"
+        <textarea id="tutor-input" class="tutor-input"
           placeholder="Ask a question about your study material… (Enter to send, Shift+Enter for new line)"
-          rows="2"
-          aria-label="Your message to the AI Study Tutor"
-        ></textarea>
+          rows="2" aria-label="Your message to the AI Study Tutor"></textarea>
         <button id="btn-tutor-send" type="button" class="btn btn-primary" aria-label="Send message">
-          Send
+          Send ↑
         </button>
       </div>
     </section>
@@ -514,12 +455,9 @@
   </main>
 
   <footer class="site-footer" role="contentinfo">
-    <p>StudyLens AI &copy; <span id="footer-year"></span></p>
+    <p>StudyLens AI &copy; <span id="footer-year"></span> &nbsp;·&nbsp; AI-powered exam readiness</p>
   </footer>
 
-  <!-- =====================================================================
-       JavaScript modules (loaded after DOM; no defer needed for type=module)
-       ===================================================================== -->
   <script type="module" src="/static/js/api.js"></script>
   <script type="module" src="/static/js/auth.js"></script>
   <script type="module" src="/static/js/upload.js"></script>
@@ -529,9 +467,52 @@
   <script type="module" src="/static/js/tutor.js"></script>
   <script type="module" src="/static/js/dashboard.js"></script>
 
-  <!-- Inline: set footer year without a module dependency -->
   <script>
     document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+    // File selection feedback for dropzones
+    document.addEventListener('DOMContentLoaded', function() {
+      function setupDropzone(inputId, labelClass) {
+        var input = document.getElementById(inputId);
+        if (!input) return;
+        var zone = input.closest('.upload-dropzone');
+        if (!zone) return;
+        var hint = zone.querySelector('.upload-dropzone-hint');
+        input.addEventListener('change', function() {
+          if (input.files && input.files[0]) {
+            var name = input.files[0].name;
+            var mb = (input.files[0].size / 1048576).toFixed(1);
+            if (hint) hint.textContent = '\u2713 ' + name + ' (' + mb + ' MB)';
+            zone.style.borderColor = 'var(--color-primary)';
+            zone.style.backgroundColor = 'var(--color-primary-light)';
+          }
+        });
+      }
+      setupDropzone('input-study-material');
+      setupDropzone('input-syllabus');
+
+      // Report panel: open tutor button
+      var reportTutorBtn = document.getElementById('btn-report-open-tutor');
+      if (reportTutorBtn) {
+        reportTutorBtn.addEventListener('click', function() {
+          // Delegate to the session stored in the report
+          if (window._currentReportSessionId && window.openTutor) {
+            window.openTutor(window._currentReportSessionId);
+          }
+        });
+      }
+
+      // History empty state: start analysis
+      var histStartBtn = document.getElementById('btn-history-start');
+      if (histStartBtn) {
+        histStartBtn.addEventListener('click', function() {
+          var histPanel = document.getElementById('history-panel');
+          var uploadPanel = document.getElementById('upload-panel');
+          if (histPanel) histPanel.hidden = true;
+          if (uploadPanel) uploadPanel.hidden = false;
+        });
+      }
+    });
   </script>
 
 </body>
