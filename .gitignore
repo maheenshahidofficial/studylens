@@ -1,4 +1,4 @@
-# Environment files — never commit secrets
+# Environment files -- never commit secrets
 .env
 .env.*
 !.env.example
@@ -15,10 +15,10 @@ __pycache__/
 *.pyd
 .Python
 
-# Database file
+# Database files
 *.db
 
-# Uploaded user files
+# Uploaded user files (local dev only -- ephemeral on Vercel)
 uploads/
 
 # Pytest cache
@@ -39,13 +39,15 @@ Thumbs.db
 test_*.txt
 test_*.log
 
-# Temporary bat/helper scripts from development
+# Temporary dev helper scripts
+chk.bat
 run_tests.bat
 run_all.bat
 ft.bat
 ft.py
 fix_tasks.py
 cleanup.bat
+git_status.txt
 
-# Temporary secret generation script
+# Secret generation script
 _gen_secret.py

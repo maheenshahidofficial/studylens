@@ -230,8 +230,8 @@ class AnalysisResult:
     revision_plan: dict
 
 
-_TOTAL_PIPELINE_BUDGET = 120.0  # seconds
-_PER_CALL_TIMEOUT = 60          # seconds
+_TOTAL_PIPELINE_BUDGET = 50.0   # seconds (reduced for Vercel 60s limit)
+_PER_CALL_TIMEOUT = 25          # seconds (reduced for Vercel 60s limit)
 
 _GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 _DEFAULT_MODEL = "openai/gpt-oss-120b"
